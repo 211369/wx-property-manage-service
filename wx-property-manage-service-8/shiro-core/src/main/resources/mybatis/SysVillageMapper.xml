@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+    <mapper namespace="com.zyd.shiro.persistence.mapper.SysVillageMapper">
+    <resultMap id="vm" type="com.zyd.shiro.persistence.beans.SysVillage">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="villageName" jdbcType="VARCHAR" column="village_name"/>
+        <result property="shopCode" jdbcType="VARCHAR" column="shop_code"/>
+        <result property="createTime" jdbcType="DATE" column="create_time"/>
+        <result property="updateTime" jdbcType="DATE" column="update_time"/>
+        <result property="mark" jdbcType="VARCHAR" column="mark"/>
+        <result property="staffCode" jdbcType="VARCHAR" column="staff_code"/>
+    </resultMap>
+    <select id="findPageBreakByCondition" parameterType="com.zyd.shiro.business.vo.ResourceConditionVO" resultMap="vm">
+        SELECT
+        com.*
+        FROM
+        sys_village com
+        WHERE
+        1 = 1
+        <if test="keywords !=null and keywords != ''">
+            AND (
+            com.village_name LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%')
+            )
+        </if>
+        ORDER by
+        com.create_time ASC
+    </select>
+</mapper>

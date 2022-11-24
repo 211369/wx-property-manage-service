@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ReportMapper">
+
+    <resultMap id="rm" type="com.zyd.shiro.business.entity.AccountReceiveItem">
+        <result property="orderId" jdbcType="VARCHAR" column="order_id"/>
+        <result property="houseId" jdbcType="VARCHAR" column="house_id"/>
+        <result property="payTime" jdbcType="VARCHAR" column="pay_time"/>
+        <result property="costName" jdbcType="VARCHAR" column="cost_name"/>
+        <result property="costType" jdbcType="VARCHAR" column="cost_type"/>
+        <result property="costTypeClass" jdbcType="VARCHAR" column="cost_type_class"/>
+        <result property="costTypeSection" jdbcType="VARCHAR" column="cost_type_section"/>
+        <result property="pay" jdbcType="DECIMAL" column="pay"/>
+        <result property="unit" jdbcType="DECIMAL" column="unit"/>
+        <result property="roomArea" jdbcType="DOUBLE" column="room_area"/>
+        <result property="billType" jdbcType="INTEGER" column="bill_type"/>
+        <result property="carNo" jdbcType="VARCHAR" column="car_no"/>
+        <result property="beginTime" jdbcType="VARCHAR" column="begin_time"/>
+        <result property="endTime" jdbcType="VARCHAR" column="end_time"/>
+    </resultMap>
+
+    <select id="queryReceive" parameterType="com.zyd.shiro.business.entity.AccountReceiveReq" resultMap="rm">
+        select * from property_bill_info t
+        inner join property_bill_item t1 on t.order_id = t1.order_id
+        inner join property_cost_config t2 on t1.cost_id = t2.cost_id
+        inner join property_house_info t3 on t3.house_id = t.house_id
+        <where>
+            t.status = 0
+            <if test="billType != null">
+                and t.bill_type = #{billType}
+            </if>
+            <if test="payBegin != null and payBegin !=''">
+                and t.pay_time &gt; #{payBegin}
+            </if>
+            <if test="payEnd != null and payEnd !=''">
+                and t.pay_time &lt; #{payEnd}
+            </if>
+            <if test="costType != null and costType !=''">
+                and t2.cost_type = #{costType}
+            </if>
+            <if test="costName != null and costName !=''">
+                and t2.cost_name = #{costName}
+            </if>
+            <if test="village != null and village !=''">
+                and t3.village = #{village}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryShould" parameterType="com.zyd.shiro.business.entity.AccountReceiveReq" resultMap="rm">
+        select * from property_cost_effective t
+        inner join property_house_info t1 on t1.house_id = t.house_id
+        inner join property_cost_config t2 on t2.cost_id = t.cost_id
+        left join property_house_car t3 on t.car_id = t3.car_id
+        <where>
+            t2.del_flag = 1
+            <if test="costType != null and costType !=''">
+                and t2.cost_type = #{costType}
+            </if>
+            <if test="costName != null and costName !=''">
+                and t2.cost_name = #{costName}
+            </if>
+            <if test="village != null and village !=''">
+                and t1.village = #{village}
+            </if>
+        </where>
+    </select>
+
+    <select id="advanceQuery" parameterType="com.zyd.shiro.business.entity.Deposit" resultType="com.zyd.shiro.business.entity.Deposit">
+        select
+        t.order_id as orderId,
+        t.bill_type as billType,
+        t.pay_time as payTime,
+        t.pay_type as payType,
+        t1.cost_id as costId,
+        t1.order_id as orderId,
+        t1.cost_name as costName,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.unit as unit,
+        t1.discount as discount,
+        t1.discount_rate as discountRate,
+        t1.area as area,
+        t1.car_no as carId,
+        t1.license_plate_no as licensePlateNo,
+        t1.pay as pay,
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone
+        from property_bill_info t
+        left join property_bill_item t1 on t.order_id = t1.order_id
+        left join property_house_info t2 on t.house_id = t2.house_id
+        where t.status = 0
+        and t1.begin_time is not null
+        and t1.begin_time != ''
+        <if test="costType != null and costType !=''">
+            and t1.cost_type = #{costType}
+        </if>
+        <if test="costName != null and costName !=''">
+            and t1.cost_name = #{costName}
+        </if>
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="ownerName != null and ownerName !=''">
+            and t2.owner_name = #{ownerName}
+        </if>
+        <if test="ownerPhone != null and ownerPhone !=''">
+            and t2.owner_phone = #{ownerPhone}
+        </if>
+        <if test="billType != null">
+            and t.bill_type = #{billType}
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t.pay_time &gt; #{beginTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and t.pay_time &lt; #{endTime}
+        </if>
+        order by t2.village,t2.building,t2.location,t2.room
+    </select>
+
+    <select id="debtQuery" parameterType="com.zyd.shiro.business.entity.Deposit" resultType="com.zyd.shiro.business.entity.Deposit">
+        select
+        s.cost_id as costId,
+        s.cost_name as costName,
+        s.cost_type as costType,
+        s.cost_type_class as costTypeClass,
+        s.cost_type_section as costTypeSection,
+        s.unit as unit,
+        t.begin_time as beginTime,
+        t1.car_no as carId,
+        t1.license_plate_no as licensePlateNo,
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone
+        from `property_cost_effective` t
+        inner join property_cost_config s on t.cost_id=s.cost_id
+        left join property_house_car t1 on t1.car_id = t.car_id
+        inner join property_house_info t2 on t.house_id = t2.house_id
+        where
+        s.del_flag=1
+        and t.pay_flag = 0
+        and t.begin_time is not null
+        and t.begin_time != ''
+        <if test="costType != null and costType !=''">
+            and s.cost_type = #{costType}
+        </if>
+        <if test="costName != null and costName !=''">
+            and s.cost_name = #{costName}
+        </if>
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="ownerName != null and ownerName !=''">
+            and t2.owner_name = #{ownerName}
+        </if>
+        <if test="ownerPhone != null and ownerPhone !=''">
+            and t2.owner_phone = #{ownerPhone}
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t.begin_time &lt; #{beginTime}
+        </if>
+        order by t2.village,t2.building,t2.location,t2.room
+    </select>
+
+    <select id="queryRefund" parameterType="com.zyd.shiro.business.entity.Deposit" resultType="com.zyd.shiro.business.entity.Deposit">
+        select
+        t.order_id as orderId,
+        t.bill_type as billType,
+        t.pay_time as payTime,
+        t.pay_type as payType,
+        t1.cost_id as costId,
+        t1.order_id as orderId,
+        t1.cost_name as costName,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.unit as unit,
+        t1.discount as discount,
+        t1.discount_rate as discountRate,
+        t1.area as area,
+        t1.car_no as carId,
+        t1.license_plate_no as licensePlateNo,
+        t1.pay as pay,
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone
+        from property_bill_info t
+        left join property_bill_item t1 on t.order_id = t1.order_id
+        left join property_house_info t2 on t.house_id = t2.house_id
+        where t.bill_type = 1 and t.status = 0
+        <if test="costName != null and costName !=''">
+            and t1.cost_name = #{costName}
+        </if>
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="ownerName != null and ownerName !=''">
+            and t2.owner_name = #{ownerName}
+        </if>
+        <if test="ownerPhone != null and ownerPhone !=''">
+            and t2.owner_phone = #{ownerPhone}
+        </if>
+        <if test="costType != null and costType !=''">
+            and t1.cost_type = #{costType}
+        </if>
+        order by t.pay_time desc
+    </select>
+
+    <resultMap id="houseBillRm" type="com.zyd.shiro.business.entity.HouseBill">
+        <result column="house_id" jdbcType="VARCHAR" property="houseId" />
+        <result column="village" jdbcType="VARCHAR" property="village" />
+        <result column="building" jdbcType="VARCHAR" property="building" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+        <result column="room" jdbcType="VARCHAR" property="room" />
+        <result column="room_area" jdbcType="VARCHAR" property="roomArea" />
+        <result column="owner_name" jdbcType="VARCHAR" property="ownerName" />
+        <result column="begin_time" jdbcType="VARCHAR" property="beginTime" />
+        <collection property="configs" column="house_id" select="queryConfigs" javaType="java.util.List">
+            <result column="cost_type" jdbcType="VARCHAR" property="costType" />
+            <result column="cost_name" jdbcType="VARCHAR" property="costName" />
+            <result column="unit" jdbcType="VARCHAR" property="unit" />
+        </collection>
+        <collection property="billInfos" column="house_id" select="queryBillInfos" javaType="java.util.List">
+            <result column="begin_time" jdbcType="VARCHAR" property="beginTime" />
+            <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+            <result column="discount" jdbcType="VARCHAR" property="discount" />
+            <result column="pay_time" jdbcType="VARCHAR" property="payTime" />
+            <result column="pay_sum" jdbcType="VARCHAR" property="paySum" />
+        </collection>
+    </resultMap>
+
+    <select id="queryHouseBill" parameterType="java.lang.String" resultMap="houseBillRm">
+        select t.house_id,t.village,t.building,t.location,t.room,t.room_area,t.owner_name,t1.begin_time from property_house_info t
+        inner join property_cost_effective t1 on t.house_id = t1.house_id
+		inner join property_cost_config t2 on t2.cost_id  = t1.cost_id
+		where t2.cost_type = '物业费' and t.village = #{village}
+		group by t.house_id,t1.begin_time
+		order by t.building,t.location,t.room
+    </select>
+
+    <select id="queryConfigs" parameterType="java.lang.String" resultType="com.zyd.shiro.business.entity.Config">
+        select t1.cost_type as costType ,t1.cost_name as costName ,t1.unit from property_cost_effective t
+        inner join property_cost_config t1 on t.cost_id = t1.cost_id
+        where t1.del_flag = 1 and t1.cost_type = '物业费' and t.house_id = #{houseId}
+    </select>
+
+    <select id="queryBillInfos" parameterType="java.lang.String" resultType="com.zyd.shiro.business.entity.BillExcel">
+        select t.pay_time as payTime,t1.pay as paySum,t1.begin_time as beginTime,t1.end_time as endTime,t1.discount from property_bill_info t
+        inner join property_bill_item t1 on t.order_id = t1.order_id
+        where t.bill_type = 0 and t.status = 0 and t.house_id = #{houseId} and t1.cost_type = '物业费' order by t.pay_time
+    </select>
+
+    <select id="queryDetails" parameterType="java.lang.String" resultType="com.zyd.shiro.business.entity.BillItem">
+        select
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.cost_name as costName,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.pay,
+        t.bill_type as billType
+        from property_bill_info t
+        inner join property_bill_item t1 on t.order_id = t1.order_id
+        inner join property_house_info t2 on t2.house_id = t.house_id
+        where t.`status` = 0 and t.pay_time &gt; #{beginTime} and t.pay_time &lt; #{endTime} and t2.village = #{village}
+    </select>
+
+    <delete id="deleteHouseBill">
+        delete from `property_report_detail`
+        where `year` = #{year} and village= #{village}
+    </delete>
+
+    <insert id="addHouseBill">
+        insert into property_report_detail
+        (
+        house_id,
+        village,
+        building,
+        location,
+        room,
+        room_area,
+        owner_name,
+        month_money,
+        year_money,
+        should_money,
+        pay_time,
+        begin_time,
+        end_time,
+        receive_money,
+        unreceive_money,
+        discount,
+        remark,
+        update_time,
+        `year`
+        )
+        values
+        <foreach collection="list" item="p" index="index" separator=",">
+            (
+            #{p.houseId},
+            #{p.village},
+            #{p.building},
+            #{p.location},
+            #{p.room},
+            #{p.roomArea},
+            #{p.ownerName},
+            #{p.monthMoney},
+            #{p.yearMoney},
+            #{p.shouldMoney},
+            #{p.payTime},
+            #{p.beginTime},
+            #{p.endTime},
+            #{p.receiveMoney},
+            #{p.unReceiveMoney},
+            #{p.discount},
+            #{p.remark},
+            now(),
+            #{year}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryHouseBillDetail" resultType="com.zyd.shiro.business.entity.HouseBillDTO">
+        select
+        house_id as houseId,
+        village,
+        building,
+        location,
+        room,
+        room_area as roomArea,
+        owner_name as ownerName,
+        month_money as monthMoney,
+        year_money as yearMoney,
+        should_money as shouldMoney,
+        pay_time as payTime,
+        begin_time as beginTime,
+        end_time as endTime,
+        receive_money as receiveMoney,
+        unreceive_money as unReceiveMoney,
+        discount,
+        remark
+        from property_report_detail where village = #{village} and `year` = #{year}
+        order by `year`,village,building,location,room
+    </select>
+
+    <resultMap id="carBillRm" type="com.zyd.shiro.business.entity.CarBill">
+        <result column="village" jdbcType="VARCHAR" property="village" />
+        <result column="building" jdbcType="VARCHAR" property="building" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+        <result column="room" jdbcType="VARCHAR" property="room" />
+        <result column="cost_id" jdbcType="VARCHAR" property="costId" />
+        <result column="cost_name" jdbcType="VARCHAR" property="costName" />
+        <result column="cost_type" jdbcType="VARCHAR" property="costType" />
+        <result column="cost_type_class" jdbcType="VARCHAR" property="costTypeClass" />
+        <result column="cost_type_section" jdbcType="VARCHAR" property="costTypeSection" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="car_no" jdbcType="VARCHAR" property="carNo" />
+        <result column="license_plate_no" jdbcType="VARCHAR" property="licensePlateNo" />
+        <collection property="billInfos" column="{carNo= car_no,costId= cost_id}" select="queryCarBillInfos" javaType="java.util.List">
+            <result column="begin_time" jdbcType="VARCHAR" property="beginTime" />
+            <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+            <result column="pay_time" jdbcType="VARCHAR" property="payTime" />
+            <result column="pay" jdbcType="VARCHAR" property="pay" />
+        </collection>
+    </resultMap>
+
+    <select id="queryCarBill" parameterType="java.lang.String" resultMap="carBillRm">
+        select
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t1.cost_id,
+        t1.cost_name,
+        t1.cost_type,
+        t1.cost_type_class,
+        t1.cost_type_section,
+        t1.unit,
+        t.car_no,
+        t.license_plate_no
+        from property_house_car t
+        left join property_cost_config t1 on t1.cost_id = t.cost_id
+		left join property_house_info t2 on t.house_id = t2.house_id
+		where t2.village = #{village}
+    </select>
+
+    <select id="queryCarBillInfos" resultType="com.zyd.shiro.business.entity.BillExcel">
+        select t.pay_time as payTime,t1.pay,t1.begin_time as beginTime,t1.end_time as endTime from property_bill_info t
+        inner join property_bill_item t1 on t.order_id = t1.order_id
+        where t.bill_type = 0 and t.status = 0 and t1.cost_id = #{costId} and t1.car_no = #{carNo} order by t.pay_time
+    </select>
+
+
+    <resultMap id="houseRm" type="com.zyd.shiro.business.entity.HouseBill">
+        <result column="house_id" jdbcType="VARCHAR" property="houseId" />
+        <result column="village" jdbcType="VARCHAR" property="village" />
+        <result column="building" jdbcType="VARCHAR" property="building" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+        <result column="room" jdbcType="VARCHAR" property="room" />
+        <result column="room_area" jdbcType="VARCHAR" property="roomArea" />
+        <result column="owner_name" jdbcType="VARCHAR" property="ownerName" />
+        <collection javaType="java.util.List" column="house_id"
+                    property="billInfos" select="queryInfos">
+            <result column="bill_type" jdbcType="VARCHAR" property="billType" />
+            <result column="pay_time" jdbcType="VARCHAR" property="payTime" />
+            <result column="pay" jdbcType="VARCHAR" property="pay" />
+            <result column="cost_name" jdbcType="VARCHAR" property="costName" />
+            <result column="cost_type" jdbcType="VARCHAR" property="costType" />
+        </collection>
+    </resultMap>
+
+    <select id="queryEarnest" parameterType="java.lang.String" resultMap="houseRm">
+        select t.house_id,t.village,t.building,t.location,t.room,t.room_area,t.owner_name
+        from property_house_info t
+		where t.village = #{village}
+		order by t.building,t.location,t.room
+    </select>
+
+    <select id="queryInfos" resultType="com.zyd.shiro.business.entity.BillExcel">
+        select t1.pay_time as payTime,t2.pay,t2.cost_name as costName,t2.cost_type as costType,t1.bill_type as billType from property_bill_info t1
+        inner join property_bill_item t2 on t1.order_id = t2.order_id
+        where t1.status = 0 and t2.cost_type != '车位费' and t2.cost_type != '物业费' and t1.house_id = #{houseId}
+    </select>
+</mapper>

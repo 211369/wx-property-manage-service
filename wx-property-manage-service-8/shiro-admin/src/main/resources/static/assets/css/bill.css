@@ -1,0 +1,104 @@
+.bill{
+    width: 920px;
+    font-size: 14px;
+    color: #101010;
+    font-weight: 600;
+    padding: 30px 30px 40px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+}
+.bill #qrCode{
+    width:70px;
+    height: 70px;
+    position: absolute;
+    top: 40px;
+    right:30px;
+    display: none;
+}
+.bill .title div{
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+}
+.bill .custInfo{
+    font-size: 13px;
+    margin-top: 20px;
+    padding-left: 5px;
+    display: flex;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+}
+.bill .custInfo li{
+    list-style: none;
+    text-align: left;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+}
+.bill .custInfo li:first-of-type,.bill .custInfo li:nth-of-type(3){
+    width: 45%;
+}
+.bill .custInfo li:nth-of-type(2),.bill .custInfo li:nth-of-type(4){
+    width: 55%;
+}
+.bill .custInfo li .infoTitle{
+     display: inline-block;
+     width: 66px;
+ }
+.bill .custInfo li .infoContent{
+    white-space: nowrap;
+}
+.bill table{
+    width: 860px;
+    margin: 15px auto;
+    font-size: 13px;
+    text-align: center;
+    font-weight: normal;
+    background-color: #fff;
+}
+.bill table thead{
+    background-color: #fff;
+}
+.bill table thead td{
+    font-weight: bolder;
+}
+.bill table td{
+    height: 30px;
+    font-weight: 500;
+    padding: 0px 8px;
+    white-space: nowrap;
+}
+.bill .otherInfo{
+    text-align: left;
+    font-size: 13px;
+    position: relative;
+}
+.bill .otherInfo div{
+    margin-bottom: 5px;
+}
+.bill .otherInfo div .receiveName{
+    margin-right: 120px;
+}
+.bill .otherInfo div .comp{
+    float: right;
+    margin-right: 100px;
+}
+.bill .otherInfo img{
+    width: 240px;
+    position: absolute;
+    top: -60px;
+    right: -27px;
+}

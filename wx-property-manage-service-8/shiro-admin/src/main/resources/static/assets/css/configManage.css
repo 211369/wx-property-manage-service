@@ -1,0 +1,51 @@
+.content_bg_common{
+    padding: 5px 10px;
+}
+#myTab{
+    border: none;
+}
+#myTab>li{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#myTab>li>a{
+    display: inline-block;
+    color: #101010;
+    font-size: 15px;
+    padding: 5px 0;
+    border: none;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+#myTab>li:nth-of-type(2)>a{
+    margin: 0 16px;
+}
+#myTab>li>a:hover, #myTab>li>a:focus{
+    border: none;
+    font-weight: normal;
+}
+#myTab>li.active>a{
+    font-weight: bolder;
+    border: none;
+    border-bottom: 4px solid #428bca!important;
+}
+#selectVillage{
+    margin: 10px 0 0px;
+    padding: 0 2px;
+    height: 30px;
+    min-width: 260px;
+}
+#table{
+    height: 70px;
+}
+#table,#table thead tr .th-inner {
+    text-align: center;
+}
+#table .btn{
+    margin: 0 10px;
+}
+#addBtn{
+    margin-top: 15px;
+}

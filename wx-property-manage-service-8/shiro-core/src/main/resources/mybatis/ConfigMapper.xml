@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ConfigMapper">
+
+    <resultMap id="rm" type="com.zyd.shiro.business.entity.Config">
+        <result property="costId" jdbcType="VARCHAR" column="cost_id"/>
+        <result property="village" jdbcType="VARCHAR" column="village"/>
+        <result property="costName" jdbcType="VARCHAR" column="cost_name"/>
+        <result property="costType" jdbcType="VARCHAR" column="cost_type"/>
+        <result property="costTypeClass" jdbcType="VARCHAR" column="cost_type_class"/>
+        <result property="costTypeSection" jdbcType="VARCHAR" column="cost_type_section"/>
+        <result property="unit" jdbcType="DECIMAL" column="unit"/>
+        <result property="delFlag" jdbcType="INTEGER" column="del_flag"/>
+        <result property="updateTime" jdbcType="DATE" column="update_time"/>
+        <result property="mark" jdbcType="VARCHAR" column="mark"/>
+    </resultMap>
+
+    <select id="queryVillage" resultType="java.lang.String">
+        select village from property_house_info group by village
+    </select>
+
+    <select id="queryVillageByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select prv.village
+        from property_role_village prv
+        inner join sys_user_role sur on prv.role_id = sur.role_id
+        where sur.user_id = #{userId}
+    </select>
+
+    <select id="queryVillageNotConfig" resultType="java.lang.String">
+        select village from property_house_info where village not in (select distinct village_name from sys_village) group by village
+    </select>
+
+    <select id="queryVillageNotConfigByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select prv.village
+        from property_role_village prv
+        inner join sys_user_role sur on prv.role_id = sur.role_id
+        where sur.user_id = #{userId} and prv.village not in (select distinct village_name from sys_village)
+    </select>
+
+    <select id="queryByVillage" parameterType="java.lang.String" resultMap="rm">
+        select * from property_cost_config where village = #{village} and del_flag = 1 order by cost_type desc
+    </select>
+
+    <select id="queryCostName" parameterType="java.lang.String" resultType="java.lang.String">
+        select distinct(cost_name) from property_cost_config
+        where
+        del_flag = 1 and (cost_type = '物业费' or cost_type = '车位费')
+        <if test="costType != null and costType !=''">
+            and cost_type = #{costType}
+        </if>
+        order by cost_name desc
+    </select>
+
+    <select id="queryByCostId" parameterType="java.lang.String" resultMap="rm">
+        select * from property_cost_config where cost_id = #{costId}
+    </select>
+
+    <select id="exist" parameterType="com.zyd.shiro.business.entity.Config" resultMap="rm">
+        select * from property_cost_config
+        where
+        village = #{village} and
+        del_flag = 1 and
+        cost_name = #{costName} and
+        cost_type = #{costType} and
+        cost_type_class = #{costTypeClass} and
+        cost_type_section = #{costTypeSection} and
+        unit = #{unit}
+    </select>
+
+    <select id="existEffective" resultType="com.zyd.shiro.business.entity.ExistHouse">
+        select
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t3.cost_id as costId,
+        t3.cost_name as costName,
+        t3.cost_type as costType,
+        t3.cost_type_class as costTypeClass,
+        t3.cost_type_section as costTypeSection,
+        t3.unit,
+        t4.car_no as carNo,
+        t4.license_plate_no as licensePlateNo,
+        t1.car_id as carId,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime
+        from property_cost_config t3
+        left join property_cost_effective t1 on t1.cost_id = t3.cost_id
+        left join property_house_info t2 on t1.house_id = t2.house_id
+        left join property_house_car t4 on t1.car_id = t4.car_id
+        where t3.cost_id = #{costId}
+    </select>
+
+    <insert id="add" parameterType="com.zyd.shiro.business.entity.Config">
+        insert into property_cost_config
+            (
+            cost_id,
+            village,
+            cost_name,
+            cost_type,
+            cost_type_class,
+            cost_type_section,
+            unit,
+            del_flag,
+            update_time,
+            mark
+            )
+        values
+            (
+            #{costId},
+            #{village},
+            #{costName},
+            #{costType},
+            #{costTypeClass},
+            #{costTypeSection},
+            #{unit},
+            #{delFlag},
+            #{updateTime},
+            #{mark}
+            )
+    </insert>
+
+    <update id="update" parameterType="com.zyd.shiro.business.entity.Config">
+        update property_cost_config
+        <set>
+            <if test="village != null and village !=''">
+                village = #{village},
+            </if>
+            <if test="costName != null and costName !=''">
+                cost_name = #{costName},
+            </if>
+            <if test="costType != null and costType !=''">
+                cost_type = #{costType},
+            </if>
+            <if test="costTypeClass != null and costTypeClass !=''">
+                cost_type_class = #{costTypeClass},
+            </if>
+            <if test="costTypeSection != null and costTypeSection !=''">
+                cost_type_section = #{costTypeSection},
+            </if>
+            <if test="unit != null">
+                unit = #{unit},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag},
+            </if>
+            <if test="mark != null and mark !=''">
+                mark = #{mark},
+            </if>
+        </set>
+        where cost_id = #{costId}
+    </update>
+
+    <insert id="addOrUpdateHouse">
+        insert into property_house_info
+        (
+        house_id,
+        village,
+        building,
+        location,
+        room,
+        room_area,
+        owner_name,
+        owner_phone,
+        id_card_no,
+        reserve_phone,
+        update_time,
+        check_in_time
+        )
+        values
+        <foreach collection="list" item="p" index="index" separator=",">
+            (
+            #{p.houseId},
+            #{p.village},
+            #{p.building},
+            #{p.location},
+            #{p.room},
+            #{p.roomArea},
+            #{p.ownerName},
+            #{p.ownerPhone},
+            #{p.idCardNo},
+            #{p.reservePhone},
+            #{p.updateTime},
+            #{p.checkInTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        room_area=values(room_area),
+        owner_name=values(owner_name),
+        owner_phone=values(owner_phone),
+        id_card_no=values(id_card_no),
+        reserve_phone=values(reserve_phone),
+        update_time=values(update_time),
+        check_in_time=values(check_in_time)
+    </insert>
+
+    <insert id="addOrUpdateConfig">
+        insert into property_cost_config
+        (
+        cost_id,
+        village,
+        cost_name,
+        cost_type,
+        cost_type_class,
+        cost_type_section,
+        unit,
+        del_flag,
+        update_time,
+        mark
+        )
+        values
+        <foreach collection="list" item="p" index="index" separator=",">
+            (
+            #{p.costId},
+            #{p.village},
+            #{p.costName},
+            #{p.costType},
+            #{p.costTypeClass},
+            #{p.costTypeSection},
+            #{p.unit},
+            #{p.delFlag},
+            #{p.updateTime},
+            #{p.mark}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        del_flag=values(del_flag),
+        update_time=values(update_time)
+    </insert>
+
+    <insert id="addOrUpdateEffective">
+        insert into property_cost_effective
+        (
+        house_id,
+        car_id,
+        cost_id,
+        begin_time,
+        end_time,
+        update_time,
+        pay_flag
+        )
+        values
+        <foreach collection="list" item="p" index="index" separator=",">
+            (
+            #{p.houseId},
+            #{p.carId},
+            #{p.costId},
+            #{p.beginTime},
+            #{p.endTime},
+            #{p.updateTime},
+            #{p.payFlag}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        begin_time=values(begin_time),
+        end_time=values(end_time),
+        update_time=values(update_time),
+        pay_flag=values(pay_flag)
+    </insert>
+
+    <insert id="addOrUpdateCar">
+        insert into property_house_car
+        (
+        house_id,
+        car_id,
+        car_no,
+        license_plate_no,
+        cost_id,
+        update_time
+        )
+        values
+        <foreach collection="list" item="p" index="index" separator=",">
+            (
+            #{p.houseId},
+            #{p.carId},
+            #{p.carNo},
+            #{p.licensePlateNo},
+            #{p.costId},
+            #{p.updateTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        update_time=values(update_time)
+    </insert>
+
+    <select id="queryExistHouse" resultType="com.zyd.shiro.business.entity.ExistHouse">
+        select
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t3.cost_id as costId,
+        t3.cost_name as costName,
+        t3.cost_type as costType,
+        t3.cost_type_class as costTypeClass,
+        t3.cost_type_section as costTypeSection,
+        t3.unit,
+        t4.car_no as carNo,
+        t4.license_plate_no as licensePlateNo,
+        t1.car_id as carId,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime
+        from property_cost_effective t1
+        left join property_house_info t2 on t1.house_id = t2.house_id
+        left join property_cost_config t3 on t1.cost_id = t3.cost_id
+        left join property_house_car t4 on t1.car_id = t4.car_id
+    </select>
+
+    <select id="queryExistCar" resultType="com.zyd.shiro.business.entity.ExistHouse">
+        select
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t3.cost_id as costId,
+        t3.cost_name as costName,
+        t3.cost_type as costType,
+        t3.cost_type_class as costTypeClass,
+        t3.cost_type_section as costTypeSection,
+        t3.unit,
+        t4.car_no as carNo,
+        t4.license_plate_no as licensePlateNo
+        from property_house_car t4
+        left join property_house_info t2 on t4.house_id = t2.house_id
+        left join property_cost_config t3 on t4.cost_id = t3.cost_id
+    </select>
+
+    <select id="queryProperty" parameterType="com.zyd.shiro.business.entity.PropertyQry"
+            resultType="com.zyd.shiro.business.entity.PropertyQry">
+        select
+        t4.car_id as carId,
+        t4.car_no as carNo,
+        t4.license_plate_no as licensePlateNo,
+        t3.house_id as houseId,
+        t3.village,
+        t3.building,
+        t3.location,
+        t3.room,
+        t3.room_area as roomArea,
+        t3.owner_name as ownerName,
+        t3.owner_phone as ownerPhone,
+        t3.id_card_no as idCardNo,
+        t3.reserve_phone as reservePhone,
+        t2.cost_id as costId,
+        t2.cost_name as costName,
+        t2.cost_type as costType,
+        t2.cost_type_class as costTypeClass,
+        t2.cost_type_section as costTypeSection,
+        t2.unit,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime
+        from property_cost_effective t1
+        left join property_cost_config t2 on t1.cost_id = t2.cost_id
+        left join property_house_info t3 on t1.house_id = t3.house_id
+        left join property_house_car t4 on t1.car_id = t4.car_id
+        where t2.village = #{village}
+        <if test="flag != null and 'true'.toString() == flag.toString()">
+            and t1.car_id != ''
+        </if>
+        <if test="flag != null and 'false'.toString() == flag.toString()">
+            and t1.car_id = ''
+        </if>
+        order by t3.building,t3.location,t3.room
+    </select>
+
+    <select id="queryConfigAll" resultMap="rm">
+        select * from property_cost_config
+    </select>
+
+    <select id="queryHouseAll" resultType="com.zyd.shiro.business.entity.HouseInfo">
+        select
+        house_id as houseId,
+        village,
+        building,
+        location,
+        room,
+        room_area as roomArea,
+        owner_name as ownerName,
+        owner_phone as ownerPhone,
+        id_card_no as idCardNo,
+        reserve_phone as reservePhone,
+        update_time as updateTime,
+        check_in_time as checkInTime
+        from property_house_info
+    </select>
+
+    <delete id="deleteImport" parameterType="java.util.List">
+        delete from property_cost_effective
+        where (house_id,car_id,cost_id) in
+        <foreach collection="list" item="p" index="index" separator="," open="(" close=")">
+            (
+            #{p.houseId},
+            #{p.carId},
+            #{p.costId}
+            )
+        </foreach>
+    </delete>
+</mapper>

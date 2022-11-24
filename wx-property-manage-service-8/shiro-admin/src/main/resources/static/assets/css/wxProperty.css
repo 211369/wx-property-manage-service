@@ -1,0 +1,881 @@
+.table-hover>tbody>tr:hover {
+    background-color: transparent!important;
+}
+table tr th,table tr td{
+    vertical-align: middle!important;
+    white-space: nowrap!important;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button{
+    -webkit-appearance: none !important;
+    margin: 0;
+}
+input[type="number"]{-moz-appearance:textfield;}
+button span,
+button i{
+    margin-right: 3px!important;
+}
+/*layer修改样式*/
+.layui-layer-title{
+    font-size: 22px!important;
+}
+.layui-layer-btn .layui-layer-btn0{
+    border-color: #3174eb!important;
+    background-color: #3174eb!important;
+}
+.layui-layer-btn a{
+    height: 30px!important;
+    border: 1px solid #ccc!important;
+    border-radius: 3px!important;
+}
+.layui-layer-title{
+    border-bottom: 1px solid #ddd!important;
+}
+.layui-layer-dialog .layui-layer-content{
+    padding: 20px 20px 30px!important;
+}
+/*按钮修改颜色*/
+.btn-primary{
+    background-color: #3174eb!important;
+    border-color: #3174eb!important;
+}
+.btn-danger{
+    background-color: red!important;
+    border-color: red!important;
+}
+.pagination>.active>a{
+    background-color: #3174eb!important;
+    border-color: #3174eb!important;
+}
+/*按钮修改颜色*/
+/*用户设置页面样式*/
+.user_set {
+    padding: 20px 40px;
+}
+
+.user_set h1 {
+    font-size: 22px;
+    font-weight: bolder;
+    margin-bottom: 30px;
+}
+
+.user_set .user_set_flex {
+    display: flex;
+    display: -webkit-flex;
+    display: -moz-flex;
+    align-items: center;
+}
+
+.user_set .user_set_flex p {
+    margin: 0;
+    color: #777879;
+    font-size: 15px;
+}
+
+.user_set .user_set_flex .user_set_flex_msg {
+    width: 400px;
+}
+
+.user_set .user_set_flex .user_set_flex_msg p:first-of-type {
+    color: #777879;
+    font-weight: bolder;
+    margin-bottom: 5px;
+}
+
+.user_set .user_set_flex .user_set_flex_revise {
+    color: #3174eb;
+    font-size: 15px;
+    font-weight: bolder;
+    flex: 1;
+    -webkit-flex: 1;
+    -moz-box-flex: 1;
+    cursor: pointer;
+}
+
+/*用户设置页面样式*/
+
+/*收费管理页面样式*/
+::-webkit-input-placeholder { /* WebKit browsers */
+    color: #ccc;
+    font-size: 13px;
+}
+
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: #ccc;
+    font-size: 13px;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color: #ccc;
+    font-size: 13px;
+}
+/*欠缴费页面  规则说明*/
+#payMsgModal .payMsgContent {
+    margin-bottom: 5px;
+}
+#payMsgModal .payMsgContent div{
+    font-size: 15px;
+    font-weight: bolder;
+}
+#payMsgModal .payMsgContent p{
+    margin-bottom: 0px;
+}
+.charge_manage .main {
+    margin-top: 15%;
+    text-align: center;
+}
+
+.charge_manage table td, th {
+    word-break: keep-all;
+    word-wrap: break-word;
+}
+.charge_manage #table tr td{
+    height: 45px;
+    white-space: nowrap;
+}
+.charge_manage  #table .timeInput{
+    width: 50%;
+}
+.charge_manage  #table .timeInput,
+.charge_manage  #table .discountInput,
+.charge_manage  #table .discountRateInput{
+    height: 30px;
+    display: inline-block;
+    text-align: center;
+}
+
+.charge_manage table tbody tr.no-records-found {
+    /*height: 60px;*/
+}
+
+.charge_manage #table td .pStyle {
+    margin: 0;
+    padding: 0;
+    height: 44px;
+    line-height: 44px;
+}
+
+.charge_manage #tableDiy td .pStyle {
+    margin: 0;
+    padding: 0;
+    height: 44px;
+    line-height: 44px;
+}
+
+.charge_manage #billTable td, .charge_manage #tableDiy td, .charge_manage #table td {
+    /*padding: 0;*/
+}
+
+.charge_manage #billTable td .pStyle {
+    margin: 0;
+    padding: 0 5px;
+    height: 44px;
+    line-height: 44px;
+    white-space: nowrap;
+}
+.charge_manage #billTable td .pBorder {
+    border-top:1px solid #ddd;
+}
+.charge_manage .costNum {
+    width: 100px;
+    border: 1px solid #ddd;
+    height: 24px;
+    font-size: 13px;
+}
+
+.charge_manage .main .main_title {
+    font-size: 15px;
+    margin-bottom: 2%;
+}
+
+.charge_manage .main .main_title .main_select {
+    width: 300px;
+    height: 26px;
+    font-size: 13px;
+}
+
+.charge_manage .main .entrance {
+    font-size: 15px;
+    margin-top: 3%
+}
+
+.charge_manage .main .entrance .entrance_button {
+    margin: 1%;
+    background-color: #3174eb;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    width: 140px;
+    height: 40px;
+}
+.charge_manage .payPart{
+    position: relative;
+}
+.charge_manage .payPart .charge_info{
+    margin-bottom: 10px;
+}
+.charge_manage .payPart #selectYear{
+    width: 110px;
+    height: 30px;
+    margin-left: 10px;
+    display: inline-block;
+}
+.charge_manage .payPart #payMsg{
+    color: orange;
+    font-size: 18px;
+    position: absolute;
+    right: 210px;
+    top: 42px;
+}
+.charge_manage .payPart .showBtn {
+    margin-top: 20px;
+}
+
+.charge_manage .payPart .showBtn .diyPayBtn {
+    font-size: 15px;
+    width: 140px;
+    height: 35px;
+    background-color: #3174eb;
+    border: none;
+    border-radius: 4px;
+    color: white
+}
+
+.charge_manage .payPart .showBtn #arrowUp {
+    display: none;
+}
+
+.charge_manage .payPart .showBtn .payAllBtn {
+    float: right;
+    display: inline-block;
+}
+
+.charge_manage .payPart .showBtn .payAllBtn .payMoney {
+    display: inline-block;
+}
+
+.charge_manage .payPart .showBtn .payAllBtn .payMoney .payBtn {
+    font-size: 15px;
+    float: right;
+
+}
+
+.charge_manage .payPart .showBtn .payAllBtn .showTotal {
+    float: left;
+    display: inline-block;
+}
+
+.charge_manage .payPart .showBtn .payAllBtn .showTotal .showMoney {
+    color: red;
+}
+
+.charge_manage .payPart, .charge_manage .paidPart {
+    width: 98%;
+    margin: 20px 10px auto 10px;
+    display: none;
+    font-size: 13px;
+}
+
+.charge_manage .payPart .pay_title, .charge_manage .paidPart .paid_title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.charge_manage .payPart .pay_title .return_main, .charge_manage .paidPart .paid_title .return_main {
+    float: right;
+
+}
+
+.charge_manage .table thead tr th {
+    text-align: center;
+    vertical-align: middle;
+    background: #efefef;
+}
+
+.charge_manage .payPart .partDiy {
+    display: none;
+}
+
+.charge_manage .payPart .partDiy .title {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.charge_manage .payPart .table .bs-checkbox {
+    width: 36px;
+}
+
+.charge_manage table tr td {
+    vertical-align: middle
+}
+
+.charge_manage table .operateBtn {
+    background-color: #3174eb;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px 4px 8px;
+}
+
+.charge_manage input, .charge_manage select {
+    border-radius: 3px
+}
+
+/*收费管理支付页面*/
+.charge_manage_paySelf, .charge_manage_print, .charge_manage_refund {
+    display: none;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-align: center;
+}
+
+.charge_manage_paySelf .payWindow {
+    padding-top: 10px;
+    width: 650px;
+    text-align: center;
+    /*margin: 10% auto;*/
+    padding-bottom: 20px;
+    background-color: white;
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    -webkit-transform:translate(-50%,-50%);
+    -moz-transform:translate(-50%,-50%);
+    -ms-transform:translate(-50%,-50%);
+}
+.charge_manage_paySelf .payWindow .mixType{
+    width: 85%;
+    padding-bottom: 10px;
+    margin: 20px auto 0px;
+    border:1px solid #ccc;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    position: relative;
+    display: none;
+}
+.charge_manage_paySelf .payWindow .mixType .form-group{
+    margin-bottom: 0;
+}
+.charge_manage_paySelf .payWindow .mixType>div{
+    width: 35px;
+    height: 20px;
+    background: #fff;
+    position: absolute;
+    top: -18px;
+    right: 50px;
+}
+.charge_manage_paySelf .payWindow .mixType>div img{
+    width: 100%;
+    height: 100%;
+}
+.charge_manage_paySelf .payWindow .payWindow_title {
+    margin-top: 30px;
+    font-size: 20px;
+    font-weight: bolder;
+    color: black;
+}
+
+.charge_manage_paySelf .payWindow .payIcon {
+    margin-top:60px;
+}
+
+.charge_manage_paySelf .payWindow .payIcon img {
+    width: 22%;
+    margin: 10px 0;
+}
+
+.charge_manage_paySelf .payWindow .pay_type {
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.charge_manage_paySelf .payWindow .pay_type span {
+    margin: 25px;
+}
+
+.charge_manage_paySelf .payWindow .pay_button {
+    margin-top: 30px;
+    font-size: 15px;
+}
+
+.charge_manage_paySelf .payWindow .pay_button button {
+    margin: 0 10px 0 10px;
+}
+
+.charge_manage_paySelf input, .charge_manage_paySelf select {
+    border-radius: 3px
+}
+
+/*凭证打印*/
+.charge_manage_print .printWindow {
+    padding-top: 10px;
+    width: 1000px;
+    min-height: 500px;
+    text-align: center;
+    margin: 5% auto 30px;
+    background-color: white;
+}
+
+.charge_manage_print .printWindow .print_info {
+    padding: 20px;
+    font-size: 13px;
+    color: black;
+}
+
+.charge_manage_print .print_button button {
+    font-size: 15px;
+    margin: 0 10px 0 10px;
+}
+
+/*退款*/
+.charge_manage_refund .refundWindow {
+    padding: 20px;
+    /*width: 1000px;*/
+    width: 80%;
+    min-height: 200px;
+    text-align: center;
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    -webkit-transform:translate(-50%,-50%);
+    -ms-transform:translate(-50%,-50%);
+    -moz-transform:translate(-50%,-50%);
+}
+.charge_manage_refund .refundWindow #tableRefund tr{
+    height: 45px!important;
+}
+.charge_manage_refund .refundWindow #tableRefund tr input{
+    height: 30px!important;
+    display: inline-block;
+    text-align: center;
+}
+.charge_manage_refund .refundWindow #tableRefund td {
+    vertical-align: middle;
+    padding: 2px 8px!important;
+}
+
+.charge_manage_refund .refund_button {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.charge_manage_refund .refund_button button {
+    font-size: 15px;
+    margin: 0 10px 0 10px;
+}
+
+.charge_manage_refund input, .charge_manage_refund select {
+    border-radius: 3px
+}
+
+/*收费管理页面样式*/
+/*配置管理页面样式*/
+.configManageModalBody .control-label{
+    width: 30%!important;
+}
+.configManage #myTab {
+    border: none;
+}
+
+.configManage #myTab > li {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.configManage #myTab > li > a {
+    display: inline-block;
+    color: #101010;
+    font-size: 15px;
+    padding: 5px 0;
+    border: none;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.configManage #myTab > li:nth-of-type(2) > a {
+    margin: 0 16px;
+}
+
+.configManage #myTab > li > a:hover, .configManage #myTab > li > a:focus {
+    border: none;
+    font-weight: normal;
+}
+
+.configManage #myTab > li.active > a {
+    font-weight: bolder;
+    border: none;
+    border-bottom: 4px solid #3174eb !important;
+}
+
+.configManage #selectVillage {
+    height: 30px;
+    width: 260px;
+    position: absolute;
+    /*top: 50px;*/
+    top: 20px;
+    left: 10px;
+    z-index: 10;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+.configManage #table {
+    height: 70px;
+}
+
+.configManage #table .btn {
+    margin: 0 10px;
+}
+
+.configManage #addBtn {
+    margin-top: 15px;
+}
+
+.configManage .tab-pane {
+    position: relative;
+}
+
+.configManage .tab-content .tab-pane:first-of-type {
+    margin-top: 42px;
+}
+
+.configManage .exOrImport {
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    margin-top: 10px;
+    padding-left: 300px;
+}
+
+.configManage .exOrImport .btn {
+    margin: 0 5px;
+}
+
+.configManage .fixed-table-pagination .pagination-detail, .configManage .fixed-table-pagination div.pagination {
+    margin-bottom: 0 !important;
+}
+
+/*配置管理页面样式*/
+/*财务管理页面样式*/
+#scanCode {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.financeManage .fixed-table-pagination .pagination-detail, .financeManage .fixed-table-pagination div.pagination {
+    margin-bottom: 0px;
+}
+
+.financeManage {
+    position: relative;
+}
+
+.financeManage .x_panel {
+    padding: 0 10px;
+}
+.financeManage #searchForm .form-group{
+    padding-top: 0px!important;
+}
+.financeManage #searchForm .item,
+.financeManage #searchForm .item>div,
+.financeManage #searchForm label,
+.financeManage #searchForm select {
+    padding-right: 2px!important;
+    padding-left: 2px!important;
+}
+.financeManage #searchForm .item .other{
+    text-align: center;
+    font-weight: bolder;
+    padding-top: 12px;
+}
+.financeManage #searchForm label{
+    padding-top: 4px!important;
+    white-space: nowrap;
+}
+.financeManage #searchForm {
+    margin: 10px 0 0;
+}
+.financeManage #searchForm .selectVillageMore .btn-group.open .dropdown-toggle,
+.financeManage #searchForm .selectVillageMore .btn:active{
+    box-shadow:unset!important;
+    -webkit-box-shadow:unset!important;
+}
+.financeManage #searchForm .selectVillageMore .open>.dropdown-toggle.btn-default{
+    background-color:#fff!important;
+    border-color:#ccc!important;
+}
+.financeManage #searchForm .selectVillageMore .btn-default:hover,
+.financeManage #searchForm .selectVillageMore .btn-default:active{
+    background-color:#fff!important;
+    border-color:#ccc!important;
+}
+.financeManage #searchForm .selectVillageMore .dropdown-menu>li>a{
+    padding: 3px 20px 3px 6px;
+    font-size: 14px;
+    color: #555;
+}
+.financeManage #searchForm .selectVillageMore .dropdown-menu.inner .selected,
+.financeManage #searchForm .selectVillageMore .dropdown-menu>li>a:hover{
+    background-color: #3174eb;
+}
+.financeManage #searchForm .selectVillageMore .dropdown-menu.inner .selected span.text,
+.financeManage #searchForm .selectVillageMore .dropdown-menu>li>a:hover,
+.financeManage #searchForm .selectVillageMore .dropdown-menu.inner .selected  .glyphicon-ok{
+    color: #fff;
+}
+.financeManage #searchForm .selectVillageMore .bootstrap-select .dropdown-toggle:focus{
+    outline: none!important;
+}
+.financeManage .costedInfo {
+    color: #676767;
+    margin-top: 0px;
+    font-size: 16px;
+    font-weight: bolder;
+    position: relative;
+    box-sizing: border-box;
+    padding-left: 5px;
+}
+
+.financeManage .costedInfo::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 18px;
+    background-color: #676767;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+}
+.financeManage .costedInfo .billSum,.financeManage .costedInfo .billCount{
+    color: red;
+}
+.financeManage #table td {
+    vertical-align: middle !important;
+    white-space: nowrap;
+}
+
+.financeManage #table td .pStyle {
+    margin: 0;
+    padding: 0 5px;
+    height: 44px;
+    line-height: 44px;
+    white-space: nowrap;
+}
+
+.financePrintWindow {
+    width: 920px;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+}
+
+.financePrintWindow #printInfo {
+    margin: 0 auto 20px;
+    background-color: #fff;
+}
+
+/*财务管理页面样式*/
+/*业户管理页面样式*/
+.ownerManage .btn i{
+    margin-right: 3px;
+}
+.ownerManage .btnGroup{
+    padding-left: 10px;
+    margin-top: 10px;
+}
+.ownerManage .btnGroup .btn{
+    margin-right: 10px;
+}
+.ownerManage #searchForm{
+    width: 90%;
+    position: relative;
+}
+.ownerManage #searchForm .item ,.ownerManage #searchForm .item label{
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.ownerManage #searchForm .item label{
+    white-space: nowrap;
+    padding-top: 4px;
+}
+.ownerManage #searchForm .item .items{
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.ownerManage #searchForm .form-group{
+    margin-bottom: 0;
+}
+.ownerManage #searchForm .searchBtn{
+    position: absolute;
+    right: -110px;
+    top: 8px;
+}
+.ownerManage #searchForm select.form-control{
+    padding: 6px 0;
+}
+.ownerManage #table>tbody>tr>td{
+    vertical-align: middle;
+}
+#ownerDetail .ownerDetailTitle{
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+#ownerDetail .modal-body{
+    padding:0 15px 15px;
+}
+#ownerDetailAdd #ownerDetailAddForm .carNoFlag,
+#ownerDetailAdd #ownerDetailAddForm .beginTimeFlag,
+#ownerDetailAdd #ownerDetailAddForm .endTimeFlag,
+#ownerDetailAdd #ownerDetailAddForm .beginOrEnd,
+#ownerDetailAdd #ownerDetailAddForm .beginOnly{
+    display: none;
+}
+/*业户管理页面样式*/
+/*发票管理页面样式*/
+.billManage #searchForm ._item,
+.billManage #searchForm .item .items,
+.billManage #searchForm .item label{
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.billManage #searchForm .item label{
+    padding-top: 5px;
+    white-space: nowrap;
+}
+/*发票管理页面样式*/
+/*押金台账页面样式*/
+.depositManage #searchForm ._item,
+.depositManage #searchForm .item .items,
+.depositManage #searchForm .item label{
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.depositManage #searchForm .item label{
+    padding-top: 5px;
+    white-space: nowrap;
+}
+.depositRefund {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+}
+.depositRefund .refundWindow {
+    width: 70%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    -webkit-transform:translate(-50%,-50%);
+    -moz-transform:translate(-50%,-50%);
+    -ms-transform:translate(-50%,-50%);
+}
+.depositRefund .refundWindow .refund_info{
+    margin-bottom: 30px;
+}
+.depositRefund .refundWindow .refund_info #tableRefund input{
+    margin:0 auto;
+}
+/*押金台账页面样式*/
+/*应收统计页面样式*/
+.receivableStatistics form .form-group,
+.receivableStatistics form label{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+}
+.receivableStatistics form label{
+    white-space: nowrap!important;
+    padding-top:4px!important;
+}
+.receivableStatistics table{
+    padding: 0!important;
+}
+.receivableStatistics table thead th .th-inner {
+    padding: 4px 10px!important;
+}
+.receivableStatistics #receivableTableExport{
+    width: 100%;
+    opacity: 0!important;
+}
+.receivableStatistics #receivableTableExport tr th,
+.receivableStatistics #receivableTableExport tr td{
+    text-align: center;
+}
+/*应收统计页面样式*/
+/*预收台账页面样式*/
+.advanceManage form{
+    margin-bottom: 15px;
+}
+.advanceManage form .form-group,
+.advanceManage form label{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+}
+.advanceManage form label{
+    white-space: nowrap!important;
+    padding-top:4px!important;
+}
+.advanceManage form .form-group{
+    margin-bottom: 0px!important;
+}
+/*预收台账页面样式*/
+/*申请记录和审批记录页面样式*/
+.applicationRecord form,
+.approvalRecord form{
+    margin-bottom: 15px;
+}
+.applicationRecord form .form-group,
+.applicationRecord form label,
+.approvalRecord form .form-group,
+.approvalRecord form label{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+}
+.applicationRecord form label,
+.approvalRecord form label{
+    white-space: nowrap!important;
+    padding-top:4px!important;
+}
+.applicationRecord form .form-group,
+.approvalRecord form .form-group{
+    margin-bottom: 0px!important;
+}
+/*申请记录和审批记录页面样式*/

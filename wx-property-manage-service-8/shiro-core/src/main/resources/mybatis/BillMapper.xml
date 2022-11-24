@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.BillMapper">
+
+    <resultMap id="rm" type="com.zyd.shiro.business.entity.BillItem">
+        <result property="orderId" jdbcType="VARCHAR" column="order_id"/>
+        <result property="costName" jdbcType="VARCHAR" column="cost_name"/>
+        <result property="costType" jdbcType="VARCHAR" column="cost_type"/>
+        <result property="costTypeClass" jdbcType="VARCHAR" column="cost_type_class"/>
+        <result property="costTypeSection" jdbcType="VARCHAR" column="cost_type_section"/>
+        <result property="unit" jdbcType="DECIMAL" column="unit"/>
+        <result property="pay" jdbcType="DECIMAL" column="pay"/>
+        <result property="carId" jdbcType="VARCHAR" column="car_no"/>
+        <result property="beginTime" jdbcType="VARCHAR" column="begin_time"/>
+        <result property="endTime" jdbcType="VARCHAR" column="end_time"/>
+    </resultMap>
+
+    <resultMap id="map1" type="com.zyd.shiro.business.entity.BillInfo">
+        <result column="order_id" property="orderId"/>
+        <result column="pay_sum" property="paySum"/>
+        <result column="payTime" property="payTime"/>
+        <result column="pay_type" property="payType"/>
+        <result column="bill_type" property="billType"/>
+        <result column="house" property="house"/>
+        <result column="ownerName" property="ownerName"/>
+        <result column="check_flag" property="checkFlag"/>
+        <result column="checkTime" property="checkTime"/>
+        <result column="receive_name" property="receiveName"/>
+        <result column="remark" property="remark"/>
+        <result column="refund_flag" property="refundFlag"/>
+        <result property="receiptCode" column="receipt_code"/>
+    </resultMap>
+
+    <resultMap id="map2" type="com.zyd.shiro.business.entity.BillDetailDTO">
+        <association property="billInfo" resultMap="map1"/>
+    </resultMap>
+
+    <select id="queryBillInfo" resultMap="map2">
+        SELECT distinct t.order_id , CONCAT(h.village,h.building,h.location,h.room) as house,h.owner_name as ownerName,
+        t.pay_type ,t.bill_type ,t.check_flag ,DATE_FORMAT(t.check_time, '%Y-%m-%d %H:%i:%s') as checkTime,
+        DATE_FORMAT(t.pay_time, '%Y-%m-%d %H:%i:%s') as payTime
+        ,t.pay_sum,t.receive_name,t.remark,t.refund_flag,t.receipt_code
+        FROM property_bill_info t
+        LEFT JOIN property_house_info h on t.house_id=h.house_id
+        INNER JOIN property_bill_item i on i.order_id=t.order_id
+        <where>
+            t.`status`=0
+            <if test="billType !=null">
+                and t.bill_type = #{billType}
+            </if>
+            <if test="userId !=null and userId !=''">
+                and h.village in (
+                select prv.village
+                from property_role_village prv
+                inner join sys_user_role sur on prv.role_id = sur.role_id
+                where sur.user_id = #{userId}
+                )
+            </if>
+            <if test="orderId != null and orderId !=''">
+                and t.order_id = #{orderId}
+            </if>
+            <if test="village != null and village !=''">
+                and h.village = #{village}
+            </if>
+            <if test="villages != null and villages.size>0">
+                and h.village in
+                <foreach collection="villages" item="v" separator="," open="(" close=")">
+                    #{v}
+                </foreach>
+            </if>
+            <if test="building != null">
+                and h.building = #{building}
+            </if>
+            <if test="location != null">
+                and h.location = #{location}
+            </if>
+            <if test="room != null and room !=''">
+                and h.room = #{room}
+            </if>
+            <if test="payType != null and payType !=''">
+                and t.pay_type = #{payType}
+            </if>
+            <if test="checkFlag != null and checkFlag !=''">
+                and t.check_flag = #{checkFlag}
+            </if>
+            <if test="beginTime != null and beginTime !=''">
+                and t.pay_time >= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime !=''">
+                and t.pay_time &lt;= #{endTime}
+            </if>
+            <if test="checkBeginTime != null and checkBeginTime !=''">
+                and t.check_time >= #{checkBeginTime}
+            </if>
+            <if test="checkEndTime != null and checkEndTime !=''">
+                and t.check_time &lt;= #{checkEndTime}
+            </if>
+            <if test="costType != null and costType !=''">
+                and i.cost_type = #{costType}
+            </if>
+        </where>
+        ORDER BY checkTime desc,payTime desc
+    </select>
+
+    <select id="queryFinancialAll" resultType="com.zyd.shiro.business.entity.BillExcel">
+        select
+        t.order_id as orderId,
+        t.pay_sum as paySum,
+        t.pay_time as payTime,
+        t.check_flag as checkFlag,
+        t.check_time as checkTime,
+        t.pay_type as payType,
+        t.receipt_type as receiptType,
+        t.receipt_time as receiptTime,
+        t.is_exchange as isExchange,
+        t.receipt_code as receiptCode,
+        t.remark,
+        t.refund_flag as refundFlag,
+        t1.cost_name as costName,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.unit,
+        t1.area,
+        t1.discount,
+        t1.discount_rate as discountRate,
+        t1.pay,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.car_no as carNo,
+        t1.license_plate_no as licensePlateNo,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone,
+        t2.check_in_time as checkInTime
+        from property_bill_info t
+        left join property_bill_item t1 on t.order_id = t1.order_id
+        left join property_house_info t2 on t.house_id = t2.house_id
+        where t.bill_type = 0 and t.`status` = 0
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="villages != null and villages.size>0">
+            and t2.village in
+            <foreach collection="villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="payType != null and payType !=''">
+            and t.pay_type = #{payType}
+        </if>
+        <if test="checkFlag != null and checkFlag !=''">
+            and t.check_flag = #{checkFlag}
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t.pay_time >= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and t.pay_time &lt;= #{endTime}
+        </if>
+        <if test="checkBeginTime != null and checkBeginTime !=''">
+            and t.check_time >= #{checkBeginTime}
+        </if>
+        <if test="checkEndTime != null and checkEndTime !=''">
+            and t.check_time &lt;= #{checkEndTime}
+        </if>
+        <if test="costType != null and costType !=''">
+            and t1.cost_type = #{costType}
+        </if>
+        order by t.pay_time desc
+    </select>
+
+    <select id="queryCostType" resultType="java.lang.String">
+        SELECT distinct t.cost_type FROM property_bill_item t where t.order_id = #{orderId}
+    </select>
+
+    <select id="queryBillItem" resultType="com.zyd.shiro.business.entity.BillItem">
+        SELECT
+        order_id as orderId,
+        CONCAT(cost_name,IFNULL(car_no,'')) as costName,
+        cost_type as costType,
+        cost_type_class as costTypeClass,
+        cost_type_section as costTypeSection,
+        begin_time as beginTime,
+        end_time as endTime,
+        unit as unit,
+        discount as discount,
+        discount_rate as discountRate,
+        area as area,
+        car_no as carId,
+        license_plate_no as licensePlateNo,
+        pay as pay
+        FROM property_bill_item
+        <where>
+            <if test="orderId != null and orderId !=''">
+                and order_id = #{orderId}
+            </if>
+            <if test="costType != null and costType !=''">
+                and cost_type = #{costType}
+            </if>
+        </where>
+    </select>
+
+    <!-- 修改对账状态 -->
+    <update id="updateCheckFlag" parameterType="com.zyd.shiro.business.entity.BillInfo">
+        update property_bill_info t set
+        t.check_flag = #{checkFlag} , t.check_time = #{checkTime}
+        where order_id = #{orderId}
+    </update>
+
+    <!-- 查询已对账金额、笔数 -->
+    <select id="queryCheckedCount" resultType="java.util.HashMap">
+        select count(1) as count,IFNULL(sum(r.payed),0) as sum from
+        (select distinct m.order_id,sum(m.pay_sum) as payed from (
+        select t.order_id,t.pay_sum from property_bill_info t
+        left join property_bill_item b on t.order_id = b.order_id
+        left join property_house_info h on t.house_id = h.house_id
+        where t.`status`=0 and t.bill_type =0
+        <if test="qry.checkFlag != null and qry.checkFlag !=''">
+            and t.check_flag = #{qry.checkFlag}
+        </if>
+        and h.village in (
+        select prv.village
+        from property_role_village prv
+        inner join sys_user_role sur on prv.role_id = sur.role_id
+        where sur.user_id = #{userId}
+        )
+        <if test="qry.village != null and qry.village !=''">
+            and h.village = #{qry.village}
+        </if>
+        <if test="qry.villages != null and qry.villages.size>0">
+            and h.village in
+            <foreach collection="qry.villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="qry.building != null">
+            and h.building = #{qry.building}
+        </if>
+        <if test="qry.location != null">
+            and h.location = #{qry.location}
+        </if>
+        <if test="qry.room != null and qry.room !=''">
+            and h.room = #{qry.room}
+        </if>
+        <if test="qry.costType != null and qry.costType !=''">
+            and b.cost_type = #{qry.costType}
+        </if>
+        <if test="qry.payType != null and qry.payType !=''">
+            and t.pay_type = #{qry.payType}
+        </if>
+        <if test="qry.checkFlag != null and qry.checkFlag !=''">
+            and t.check_flag = #{qry.checkFlag}
+        </if>
+        <if test="qry.beginTime != null and qry.beginTime !=''">
+            and t.pay_time >= #{qry.beginTime}
+        </if>
+        <if test="qry.endTime != null and qry.endTime !=''">
+            and t.pay_time &lt;= #{qry.endTime}
+        </if>
+        <if test="qry.checkBeginTime != null and qry.checkBeginTime !=''">
+            and t.check_time >= #{qry.checkBeginTime}
+        </if>
+        <if test="qry.checkEndTime != null and qry.checkEndTime !=''">
+            and t.check_time &lt;= #{qry.checkEndTime}
+        </if>
+        group by t.order_id,t.pay_sum
+        ) m group by m.order_id) r
+    </select>
+
+    <!-- 查询已对账金额、笔数 -->
+    <select id="queryCheckedAll" resultType="java.util.HashMap">
+        select count(1) as count,IFNULL(sum(r.payed),0) as sum from
+        (select distinct m.order_id,sum(m.pay_sum) as payed from (
+        select t.order_id,t.pay_sum from property_bill_info t
+        left join property_bill_item b on t.order_id = b.order_id
+        left join property_house_info h on t.house_id = h.house_id
+        where t.`status`=0 and t.bill_type =0
+        <if test="checkFlag != null and checkFlag !=''">
+            and t.check_flag = #{checkFlag}
+        </if>
+        <if test="village != null and village !=''">
+            and h.village = #{village}
+        </if>
+        <if test="villages != null and villages.size>0">
+            and h.village in
+            <foreach collection="villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="building != null">
+            and h.building = #{building}
+        </if>
+        <if test="location != null">
+            and h.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and h.room = #{room}
+        </if>
+        <if test="costType != null and costType !=''">
+            and b.cost_type = #{costType}
+        </if>
+        <if test="payType != null and payType !=''">
+            and t.pay_type = #{payType}
+        </if>
+        <if test="checkFlag != null and checkFlag !=''">
+            and t.check_flag = #{checkFlag}
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t.pay_time >= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and t.pay_time &lt;= #{endTime}
+        </if>
+        <if test="checkBeginTime != null and checkBeginTime !=''">
+            and t.check_time >= #{checkBeginTime}
+        </if>
+        <if test="checkEndTime != null and checkEndTime !=''">
+            and t.check_time &lt;= #{checkEndTime}
+        </if>
+        group by t.order_id,t.pay_sum
+        ) m group by m.order_id) r
+    </select>
+
+    <!-- 分类查询已对账金额、笔数 -->
+    <select id="queryCheckedAllCount" resultType="java.util.HashMap">
+        SELECT COUNT(1) AS COUNT,IFNULL(SUM(r.payed),0) AS SUM,r.pay_type,IFNULL(SUM(r.checked_pay),0) AS checked_sum,
+        COUNT(IF(r.checked_pay>0,1,NULL)) AS checked_num
+        FROM
+        (SELECT DISTINCT m.pay_type,m.order_id,SUM(m.pay_sum) AS payed,SUM(m.checked_pay) AS checked_pay
+        FROM (
+        SELECT t.pay_type,t.order_id,t.pay_sum, (CASE WHEN  t.check_flag=1 THEN t.pay_sum ELSE 0 END) AS checked_pay
+        FROM property_bill_info t
+        LEFT JOIN property_bill_item b ON t.order_id = b.order_id
+        LEFT JOIN property_house_info h ON t.house_id = h.house_id
+        WHERE t.`status`=0 AND t.bill_type =0
+        <if test="qry.checkFlag != null and qry.checkFlag !=''">
+            and t.check_flag = #{qry.checkFlag}
+        </if>
+        and h.village in (
+        select prv.village
+        from property_role_village prv
+        inner join sys_user_role sur on prv.role_id = sur.role_id
+        where sur.user_id = #{userId}
+        )
+        <if test="qry.village != null and qry.village !=''">
+            and h.village = #{qry.village}
+        </if>
+        <if test="qry.villages != null and qry.villages.size>0">
+            and h.village in
+            <foreach collection="qry.villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="qry.building != null">
+            and h.building = #{qry.building}
+        </if>
+        <if test="qry.location != null">
+            and h.location = #{qry.location}
+        </if>
+        <if test="qry.room != null and qry.room !=''">
+            and h.room = #{qry.room}
+        </if>
+        <if test="qry.costType != null and qry.costType !=''">
+            and b.cost_type = #{qry.costType}
+        </if>
+        <if test="qry.checkFlag != null and qry.checkFlag !=''">
+            and t.check_flag = #{qry.checkFlag}
+        </if>
+        <if test="qry.beginTime != null and qry.beginTime !=''">
+            and t.pay_time >= #{qry.beginTime}
+        </if>
+        <if test="qry.endTime != null and qry.endTime !=''">
+            and t.pay_time &lt;= #{qry.endTime}
+        </if>
+        <if test="qry.checkBeginTime != null and qry.checkBeginTime !=''">
+            and t.check_time >= #{qry.checkBeginTime}
+        </if>
+        <if test="qry.checkEndTime != null and qry.checkEndTime !=''">
+            and t.check_time &lt;= #{qry.checkEndTime}
+        </if>
+        GROUP BY t.order_id,t.pay_sum,t.pay_type
+        ) m GROUP BY m.order_id,m.pay_type) r GROUP BY r.pay_type
+    </select>
+
+    <!-- 分类查询已对账金额、笔数 -->
+    <select id="queryCheckedAllAll" resultType="java.util.HashMap">
+        SELECT COUNT(1) AS COUNT,IFNULL(SUM(r.payed),0) AS SUM,r.pay_type,IFNULL(SUM(r.checked_pay),0) AS checked_sum,
+        COUNT(IF(r.checked_pay>0,1,NULL)) AS checked_num
+        FROM
+        (SELECT DISTINCT m.pay_type,m.order_id,SUM(m.pay_sum) AS payed,SUM(m.checked_pay) AS checked_pay
+        FROM (
+        SELECT t.pay_type,t.order_id,t.pay_sum, (CASE WHEN  t.check_flag=1 THEN t.pay_sum ELSE 0 END) AS checked_pay
+        FROM property_bill_info t
+        LEFT JOIN property_bill_item b ON t.order_id = b.order_id
+        LEFT JOIN property_house_info h ON t.house_id = h.house_id
+        WHERE t.`status`=0 AND t.bill_type =0
+        <if test="checkFlag != null and checkFlag !=''">
+            and t.check_flag = #{checkFlag}
+        </if>
+        <if test="village != null and village !=''">
+            and h.village = #{village}
+        </if>
+        <if test="villages != null and villages.size>0">
+            and h.village in
+            <foreach collection="villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="building != null">
+            and h.building = #{building}
+        </if>
+        <if test="location != null">
+            and h.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and h.room = #{room}
+        </if>
+        <if test="costType != null and costType !=''">
+            and b.cost_type = #{costType}
+        </if>
+        <if test="checkFlag != null and checkFlag !=''">
+            and t.check_flag = #{checkFlag}
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t.pay_time >= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and t.pay_time &lt;= #{endTime}
+        </if>
+        <if test="checkBeginTime != null and checkBeginTime !=''">
+            and t.check_time >= #{checkBeginTime}
+        </if>
+        <if test="checkEndTime != null and checkEndTime !=''">
+            and t.check_time &lt;= #{checkEndTime}
+        </if>
+		GROUP BY t.order_id,t.pay_sum,t.pay_type
+		) m GROUP BY m.order_id,m.pay_type) r GROUP BY r.pay_type
+    </select>
+
+    <!-- 查询汇总 -->
+    <select id="queryGather" resultType="com.zyd.shiro.business.entity.BillGatherDao">
+        select
+        t.cost_name as costName,
+        t2.pay_type as payType,
+        t1.order_id as orderId,
+        t1.pay,
+        t2.remark,
+        t.cost_type_section as costTypeSection
+        from property_cost_config t
+        left join property_bill_item t1 on t.cost_id = t1.cost_id
+        left join property_bill_info t2 on t2.order_id = t1.order_id
+        where t.del_flag = 1 and t2.`status` = 0 and t2.bill_type = #{billType}
+        <if test="village != null and village !=''">
+            and t.village = #{village}
+        </if>
+        <if test="villages != null and villages.size>0">
+            and t.village in
+            <foreach collection="villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="beginTime != null and beginTime !=''">
+            and t2.pay_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and t2.pay_time &lt;= #{endTime}
+        </if>
+        group by t.cost_name,t2.pay_type,t1.order_id,t1.pay,t2.remark,t.cost_type_section
+    </select>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ReceiptMapper">
+
+   <resultMap id="rm" type="com.zyd.shiro.business.entity.BillItem">
+        <result property="orderId" jdbcType="VARCHAR" column="order_id"/>
+        <result property="costName" jdbcType="VARCHAR" column="cost_name"/>
+        <result property="costType" jdbcType="VARCHAR" column="cost_type"/>
+        <result property="costTypeClass" jdbcType="VARCHAR" column="cost_type_class"/>
+        <result property="costTypeSection" jdbcType="VARCHAR" column="cost_type_section"/>
+        <result property="unit" jdbcType="DECIMAL" column="unit"/>
+        <result property="pay" jdbcType="DECIMAL" column="pay"/>
+        <result property="carId" jdbcType="VARCHAR" column="car_no"/>
+        <result property="beginTime" jdbcType="VARCHAR" column="begin_time"/>
+        <result property="endTime" jdbcType="VARCHAR" column="end_time"/>
+    </resultMap>
+    
+     <resultMap id="map1" type="com.zyd.shiro.business.entity.BillInfo">
+        <result column="order_id" property="orderId"/>
+        <result column="pay_sum" property="paySum"/>
+        <result column="payTime" property="payTime"/>
+        <result column="pay_type" property="payType"/>
+        <result column="bill_type" property="billType"/>
+        <result column="house" property="house"/>
+        <result column="ownerName" property="ownerName"/>
+        <result column="ownerPhone" property="ownerPhone"/>
+        <result column="check_flag" property="checkFlag"/>
+        <result column="checkTime" property="checkTime"/>
+        <result column="receive_name" property="receiveName"/>
+        <result column="receipt_type" property="receiptType"/>
+        <result column="receipt_time" property="receiptTime"/>
+        <result column="is_exchange" property="isExchange"/>
+        <result column="receipt_code" property="receiptCode"/>
+         <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="queryReceiptInfo" resultMap="map1">
+        SELECT distinct t.order_id , CONCAT(h.village,h.building,h.location,h.room) as house,h.owner_name as ownerName,h.owner_phone as ownerPhone,
+        DATE_FORMAT(t.pay_time, '%Y-%m-%d %H:%i:%s') as payTime ,t.receipt_type,t.receipt_time,t.is_exchange,t.receipt_code,t.remark
+        FROM property_bill_info t 
+        LEFT JOIN property_house_info h on t.house_id=h.house_id
+        <where>
+        	t.`status`=0 and t.bill_type =0
+        	<if test="userId !=null and userId !=''">
+        		 and h.village in (
+			        select prv.village
+			        from property_role_village prv
+			        inner join sys_user_role sur on prv.role_id = sur.role_id
+			        where sur.user_id = #{userId}
+		        )
+        	</if>
+        	<if test="orderId != null and orderId !=''">
+	            and t.order_id = #{orderId}
+	        </if>
+        	<if test="village != null and village !=''">
+	            and h.village = #{village}
+	        </if>
+	        <if test="building != null">
+	            and h.building = #{building}
+	        </if>
+	        <if test="location != null">
+	            and h.location = #{location}
+	        </if>
+	        <if test="room != null and room !=''">
+	            and h.room = #{room}
+	        </if>
+	        <if test="receiptType != null and receiptType !=''">
+	            and t.receipt_type = #{receiptType}
+	        </if>
+	        <if test="receiptTime != null and receiptTime !=''">
+	            and t.receipt_time = #{receiptTime}
+	        </if>
+	        <if test="isExchange != null">
+	            and t.is_exchange = #{isExchange}
+	        </if>
+	       
+        </where>
+        ORDER BY payTime desc
+    </select>
+    
+    <!-- 修改对账状态 -->
+    <update id="updateExchangeFlag" parameterType="com.zyd.shiro.business.entity.BillInfo">
+        update property_bill_info t set
+        t.receipt_type = #{receiptType} , t.receipt_time = #{receiptTime},t.receipt_code = #{receiptCode}, t.is_exchange = 1	
+        where order_id = #{orderId}
+    </update>
+
+</mapper>

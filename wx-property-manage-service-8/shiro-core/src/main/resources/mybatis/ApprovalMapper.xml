@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ApprovalMapper">
+
+    <select id="queryToApproval" parameterType="com.zyd.shiro.business.entity.Approval" resultType="com.zyd.shiro.business.entity.Approval">
+		SELECT
+		t.id,
+		t.order_id AS orderId,
+		t4.apply_user AS applyUser,
+		t4.approve_user AS approveUser,
+		t.approval_type AS approvalType,
+		(CASE WHEN t4.refund_type = '0' THEN '原路退回' WHEN t4.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+		t4.status,
+		t4.remark,
+		t4.refund_id AS refundId,
+		t.insert_time AS insertTime,
+		t.update_time AS updateTime,
+		t1.house_id AS houseId,
+		t1.village,
+		t1.building,
+		t1.location,
+		t1.room,
+		t1.owner_name AS ownerName,
+		t1.owner_phone AS ownerPhone,
+		t3.cost_id AS costId,
+		t3.cost_name AS costName,
+		t3.cost_type AS costType,
+		t3.pay
+		FROM property_approval t
+		INNER JOIN property_house_info t1 ON t.house_id = t1.house_id
+		LEFT JOIN property_bill_info t2 ON t.order_id = t2.order_id AND t.house_id = t2.house_id
+		LEFT JOIN property_approval_refund t4 ON t.id = t4.approval_id
+		LEFT JOIN property_bill_item t3 ON t2.order_id = t3.order_id AND t3.cost_id = t4.cost_id
+        <where>
+			t4.apply_user = #{a.userName}
+			<if test="a.status != null">
+				and t.status = #{a.status}
+			</if>
+        	<if test="a.applyUser != null and a.applyUser !=''">
+	            and t.apply_user = #{a.applyUser}
+	        </if>
+        	<if test="a.approveUser != null and a.approveUser !=''">
+	            and t4.approve_user = #{a.approveUser}
+	        </if>
+			<if test="a.village != null and a.village !=''">
+				and t1.village = #{a.village}
+			</if>
+			<if test="a.building != null">
+				and t1.building = #{a.building}
+			</if>
+			<if test="a.location != null">
+				and t1.location = #{a.location}
+			</if>
+			<if test="a.room != null and a.room !=''">
+				and t1.room = #{a.room}
+			</if>
+			<if test="a.ownerName != null and a.ownerName !=''">
+				and t1.owner_name = #{a.ownerName}
+			</if>
+			<if test="a.ownerPhone != null and a.ownerPhone !=''">
+				and t1.owner_phone = #{a.ownerPhone}
+			</if>
+			<if test="villages != null and villages.size>0">
+				and t1.village in
+				<foreach collection="villages" item="v" separator="," open="(" close=")">
+					#{v}
+				</foreach>
+			</if>
+        </where>
+        ORDER BY t.insert_time desc
+    </select>
+
+	<select id="queryApproval1" parameterType="com.zyd.shiro.business.entity.Approval" resultType="com.zyd.shiro.business.entity.Approval">
+		SELECT
+		t.id,
+		t.order_id AS orderId,
+		t4.apply_user AS applyUser,
+		t4.approve_user AS approveUser,
+		t.approval_type AS approvalType,
+		(CASE WHEN t4.refund_type = '0' THEN '原路退回' WHEN t4.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+		t4.status,
+		t4.remark,
+		t4.refund_id AS refundId,
+		t.insert_time AS insertTime,
+		t.update_time AS updateTime,
+		t1.house_id AS houseId,
+		t1.village,
+		t1.building,
+		t1.location,
+		t1.room,
+		t1.owner_name AS ownerName,
+		t1.owner_phone AS ownerPhone,
+		t3.cost_id AS costId,
+		t3.cost_name AS costName,
+		t3.cost_type AS costType,
+		t3.pay
+		FROM property_approval t
+		INNER JOIN property_house_info t1 ON t.house_id = t1.house_id
+		LEFT JOIN property_bill_info t2 ON t.order_id = t2.order_id AND t.house_id = t2.house_id
+		LEFT JOIN property_approval_refund t4 ON t.id = t4.approval_id
+		LEFT JOIN property_bill_item t3 ON t2.order_id = t3.order_id AND t3.cost_id = t4.cost_id
+		<where>
+			t4.approval_level = 1
+			<if test="a.status != null">
+				and t.status = #{a.status}
+			</if>
+			<if test="a.applyUser != null and a.applyUser !=''">
+				and t.apply_user = #{a.applyUser}
+			</if>
+			<if test="a.approveUser != null and a.approveUser !=''">
+				and t4.approve_user = #{a.approveUser}
+			</if>
+			<if test="a.village != null and a.village !=''">
+				and t1.village = #{a.village}
+			</if>
+			<if test="a.building != null">
+				and t1.building = #{a.building}
+			</if>
+			<if test="a.location != null">
+				and t1.location = #{a.location}
+			</if>
+			<if test="a.room != null and a.room !=''">
+				and t1.room = #{a.room}
+			</if>
+			<if test="a.ownerName != null and a.ownerName !=''">
+				and t1.owner_name = #{a.ownerName}
+			</if>
+			<if test="a.ownerPhone != null and a.ownerPhone !=''">
+				and t1.owner_phone = #{a.ownerPhone}
+			</if>
+<!--			<if test="villages != null and villages.size>0">-->
+<!--				and t1.village in-->
+<!--				<foreach collection="villages" item="v" separator="," open="(" close=")">-->
+<!--					#{v}-->
+<!--				</foreach>-->
+<!--			</if>-->
+		</where>
+		ORDER BY t.insert_time desc
+	</select>
+
+	<select id="queryApproval2" parameterType="com.zyd.shiro.business.entity.Approval" resultType="com.zyd.shiro.business.entity.Approval">
+		SELECT
+		t.id,
+		t.order_id AS orderId,
+		t4.apply_user AS applyUser,
+		t4.approve_user AS approveUser,
+		t.approval_type AS approvalType,
+		(CASE WHEN t4.refund_type = '0' THEN '原路退回' WHEN t4.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+		t4.status,
+		t4.remark,
+		t4.refund_id AS refundId,
+		t.insert_time AS insertTime,
+		t.update_time AS updateTime,
+		t1.house_id AS houseId,
+		t1.village,
+		t1.building,
+		t1.location,
+		t1.room,
+		t1.owner_name AS ownerName,
+		t1.owner_phone AS ownerPhone,
+		t3.cost_id AS costId,
+		t3.cost_name AS costName,
+		t3.cost_type AS costType,
+		t3.pay
+		FROM property_approval t
+		INNER JOIN property_house_info t1 ON t.house_id = t1.house_id
+		LEFT JOIN property_bill_info t2 ON t.order_id = t2.order_id AND t.house_id = t2.house_id
+		LEFT JOIN property_approval_refund t4 ON t.id = t4.approval_id
+		LEFT JOIN property_bill_item t3 ON t2.order_id = t3.order_id AND t3.cost_id = t4.cost_id
+		<where>
+			t4.approval_level = 2
+			<if test="a.nextApproveUserList != null and a.nextApproveUserList.size>0">
+				and #{a.userName} in
+				<foreach collection="a.nextApproveUserList" item="v" separator="," open="(" close=")">
+					#{v}
+				</foreach>
+			</if>
+			<if test="a.status != null">
+				and t.status = #{a.status}
+			</if>
+			<if test="a.applyUser != null and a.applyUser !=''">
+				and t.apply_user = #{a.applyUser}
+			</if>
+
+			<if test="a.village != null and a.village !=''">
+				and t1.village = #{a.village}
+			</if>
+			<if test="a.building != null">
+				and t1.building = #{a.building}
+			</if>
+			<if test="a.location != null">
+				and t1.location = #{a.location}
+			</if>
+			<if test="a.room != null and a.room !=''">
+				and t1.room = #{a.room}
+			</if>
+			<if test="a.ownerName != null and a.ownerName !=''">
+				and t1.owner_name = #{a.ownerName}
+			</if>
+			<if test="a.ownerPhone != null and a.ownerPhone !=''">
+				and t1.owner_phone = #{a.ownerPhone}
+			</if>
+<!--						<if test="villages != null and villages.size>0">-->
+<!--							and t1.village in-->
+<!--							<foreach collection="villages" item="v" separator="," open="(" close=")">-->
+<!--								#{v}-->
+<!--							</foreach>-->
+<!--						</if>-->
+		</where>
+		ORDER BY t.insert_time desc
+	</select>
+
+	<select id="queryDetail" parameterType="java.lang.String" resultType="com.zyd.shiro.business.entity.Approval">
+		SELECT
+		t.id,
+		t.order_id AS orderId,
+		t4.apply_user AS applyUser,
+		t4.approve_user AS approveUser,
+		t.approval_type AS approvalType,
+		(CASE WHEN t4.refund_type = '0' THEN '原路退回' WHEN t4.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+		t4.status,
+		t4.remark,
+		t4.refund_id AS refundId,
+		t.insert_time AS insertTime,
+		t.update_time AS updateTime,
+		t1.house_id AS houseId,
+		t1.village,
+		t1.building,
+		t1.location,
+		t1.room,
+		t1.owner_name AS ownerName,
+		t1.owner_phone AS ownerPhone,
+		t3.cost_id AS costId,
+		t3.cost_name AS costName,
+		t3.cost_type AS costType,
+		t3.pay
+		FROM property_approval t
+		INNER JOIN property_house_info t1 ON t.house_id = t1.house_id
+		LEFT JOIN property_bill_info t2 ON t.order_id = t2.order_id AND t.house_id = t2.house_id
+		LEFT JOIN property_approval_refund t4 ON t.id = t4.approval_id
+		LEFT JOIN property_bill_item t3 ON t2.order_id = t3.order_id AND t3.cost_id = t4.cost_id
+		WHERE t.id = #{id}
+	</select>
+
+	<insert id="insertDiscountApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		insert into property_approval_discount
+		(
+		discount_id,
+		approval_id,
+		house_id,
+		apply_user,
+		approve_user,
+		<if test="discountRate != null and discountRate !=''">
+			discount_rate,
+		</if>
+		<if test="discount != null and discount !=''">
+			discount,
+		</if>
+		status,
+		approval_flag,
+		insert_time
+		)
+		values
+		(
+		#{discountId},
+		#{id},
+		#{houseId},
+		#{applyUser},
+		#{approveUser},
+		<if test="discountRate != null and discountRate !=''">
+			#{discountRate},
+		</if>
+		<if test="discount != null and discount !=''">
+			#{discount},
+		</if>
+		#{status},
+		#{approvalFlag},
+		#{insertTime}
+		)
+	</insert>
+
+	<insert id="insertRefundApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		insert into property_approval_refund
+		(
+		refund_id,
+		approval_id,
+		order_id,
+		house_id,
+		apply_user,
+		approve_user,
+		refund_type,
+		status,
+		approval_flag,
+		cost_id,
+		approval_level,
+		insert_time
+		)
+		values
+		(
+		#{refundId},
+		#{id},
+		#{orderId},
+		#{houseId},
+		#{applyUser},
+		#{approveUser},
+		#{refundType},
+		#{status},
+		#{approvalFlag},
+		#{costId},
+		#{approvalLevel},
+		#{insertTime}
+		)
+	</insert>
+
+	<insert id="insertNewRefundApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		insert into property_approval_refund
+		(
+		refund_id,
+		approval_id,
+		order_id,
+		house_id,
+		apply_user,
+		approve_user,
+		refund_type,
+		status,
+		cost_id,
+		approval_level,
+		insert_time
+		)
+		values
+		(
+		#{refundId},
+		#{id},
+		#{orderId},
+		#{houseId},
+		#{applyUser},
+		#{nextApproveUser},
+		#{refundType},
+		'0',
+		#{costId},
+		#{approvalLevel},
+		#{updateTime}
+		)
+	</insert>
+
+	<insert id="insertApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		insert into property_approval
+		(
+		id,
+		order_id,
+		cost_id,
+		house_id,
+		apply_user,
+		approve_user,
+		<if test="approvalType == '退款审批' or approvalType =='折扣审批'">
+			approval_type,
+		</if>
+		status,
+		refund_type,
+		insert_time
+		)
+		values
+		(
+		#{id},
+		#{orderId},
+		#{costId},
+		#{houseId},
+		#{applyUser},
+		#{approveUser},
+		<if test="approvalType == '退款审批' or approvalType =='折扣审批'">
+			#{approvalType},
+		</if>
+		#{status},
+		#{refundType},
+		#{insertTime}
+		)
+	</insert>
+
+	<select id="existApproval" resultType="java.lang.Integer">
+		select count(*) from property_approval t1
+		where t1.order_id = #{orderId}
+		and t1.cost_id = #{costId}
+	</select>
+
+	<select id="getId" parameterType="com.zyd.shiro.business.entity.Approval" resultType="java.lang.String">
+		select id from property_approval
+		where order_id = #{orderId}
+		and cost_id = #{costId}
+	</select>
+
+	<delete id="deleteApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		delete from property_approval
+		where order_id = #{orderId}
+		and cost_id = #{costId}
+	</delete>
+
+	<select id="existRefundApproval" resultType="java.lang.Integer">
+		select count(*) from property_approval_refund t1
+		where t1.order_id = #{orderId}
+		and t1.cost_id = #{costId}
+	</select>
+
+<!--	<select id="getNextUserName" parameterType="com.zyd.shiro.business.entity.Approval" resultType="java.lang.String">-->
+<!--		SELECT t.next_user_name as nextApproveUser-->
+<!--		FROM property_approval_flow t-->
+<!--		WHERE t.user_id = #{userId} and t.approval_type = #{approvalType}-->
+<!--	</select>-->
+
+	<select id="getNickname" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT t.nickname
+		FROM sys_user t
+		WHERE t.username = #{username}
+	</select>
+
+	<select id="getNextApproveUser" resultType="java.lang.String">
+		SELECT username FROM sys_user_role t1
+		JOIN  sys_role t ON t.id=t1.role_id
+		JOIN sys_user t2 ON t1.user_id = t2.id
+		WHERE t.description LIKE '%财务%'
+	</select>
+
+	<update id="updateStatus" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval_refund
+		set status = #{status},
+		remark = #{remark},
+		update_time = #{updateTime}
+		where refund_id = #{refundId} and approve_user = #{approveUser}
+	</update>
+
+	<update id="updateApprovalStatus" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval
+		set status = #{status},
+		remark = #{remark},
+		update_time = #{updateTime}
+		where id = #{id}
+	</update>
+
+	<update id="updateRefundApprovalStatus" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval_refund
+		set status = #{status},
+		remark = #{remark},
+		update_time = #{updateTime}
+		where refund_id = #{refundId} and approve_user = #{approveUser}
+	</update>
+
+<!--	<update id="changeRefundStatus" parameterType="com.zyd.shiro.business.entity.Approval">-->
+<!--		update property_bill_info-->
+<!--		set bill_type = #{billType}-->
+<!--		where order_id = #{orderId} and house_id = #{houseId}-->
+<!--	</update>-->
+
+	<update id="updateRefundType" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval_refund
+		set refund_type = #{refundType}
+		where refund_id = #{refundId}
+	</update>
+
+	<update id="updateApprovalRefundType" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval
+		set refund_type = #{refundType}
+		where id = #{id}
+	</update>
+
+    <update id="updateApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+        update property_approval
+        set
+		<if test="status != null">
+        	status = #{status} ,
+		</if>
+		<if test="remark != null">
+			remark = #{remark} ,
+		</if>
+        update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+	<update id="updateRefundApproval" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval_refund
+		set
+		<if test="status != null">
+			status = #{status} ,
+		</if>
+		<if test="remark != null">
+			remark = #{remark} ,
+		</if>
+		update_time = #{updateTime}
+		where refund_id = #{refundId} and approve_user = #{approveUser}
+	</update>
+
+	<select id="getBillInfo" parameterType="com.zyd.shiro.business.entity.Approval" resultType="com.zyd.shiro.business.entity.BillInfo">
+		select
+		t.order_id as orderId,
+		t.house_id as houseId,
+		t.pay_sum as paySum,
+		t.pay_time as payTime,
+		t.pay_type as payType,
+		t.bill_type as billType,
+		t.status,
+		t.receive_name as receiveName,
+		t.remark,
+		t.check_flag as checkFlag,
+		t.check_time as checkTime,
+		t.is_exchange as isExchange,
+		t.receipt_time as receiptTime,
+		t.receipt_code as receiptCode,
+		t.receipt_type as receiptType,
+		t.refund_flag AS refundFlag,
+		t.out_trade_id as outTradeId
+		from property_bill_info t
+		left join property_house_info t1
+		on t.house_id = t1.house_id
+		where t.order_id = #{orderId}
+	</select>
+
+	<select id="getBillItem" parameterType="com.zyd.shiro.business.entity.Approval" resultType="com.zyd.shiro.business.entity.BillItem">
+		select
+		t.order_id as orderId,
+		t.cost_name as costName,
+		t.cost_type as costType,
+		t.cost_type_class as costTypeClass,
+		t.cost_type_section as costTypeSection,
+		t.unit,
+		t.discount,
+		t.discount_rate as discountRate,
+		t.area,
+		t.pay,
+		t.cost_id as costId,
+		t.car_no as carNo,
+		t.license_plate_no as licensePlateNo,
+		t.begin_time as beginTime,
+		t.end_time as endTime
+		from property_bill_item t where t.order_id = #{orderId} and t.cost_id = #{costId}
+	</select>
+
+	<update id="updateDiscount" parameterType="com.zyd.shiro.business.entity.Approval">
+		update property_approval_discount set
+		<if test="discountRate != null and discountRate !=''"> discount_rate = #{discountRate} , </if>
+		<if test="discount != null and discount !=''"> discount = #{discount} , </if>
+		<if test="status != null"> status = #{status} , </if>
+		update_time = #{updateTime} where approval_id = #{id} and approve_user = #{approveUser}
+	</update>
+
+
+
+	<delete id="deleteDiscountApproval" parameterType="java.util.List">
+		delete from property_approval_discount
+		where approval_id in
+		<foreach collection="ids" item="id" index="index" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="deleteRefundApproval" parameterType="java.util.List">
+		delete from property_approval_refund
+		where approval_id in
+		<foreach collection="ids" item="id" index="index" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="listUsers" parameterType="com.zyd.shiro.business.entity.Approval" resultType="java.util.Map">
+<!--		SELECT username,nickname FROM sys_user WHERE id IN (-->
+<!--		SELECT DISTINCT user_id FROM sys_user_role WHERE role_id IN(-->
+<!--		SELECT id FROM sys_role WHERE id IN(-->
+<!--		SELECT DISTINCT role_id FROM sys_role_resources WHERE resources_id IN ('34','35')-->
+<!--		)-->
+<!--		)-->
+<!--		)-->
+		SELECT username,nickname FROM sys_user t1
+		LEFT JOIN(
+		SELECT DISTINCT user_id,role_id FROM sys_user_role WHERE role_id IN(
+		SELECT id FROM sys_role  WHERE id IN(
+		SELECT DISTINCT role_id FROM sys_role_resources WHERE resources_id IN ('34','35')
+		)
+		)
+		)t2
+		ON t1.id = t2.user_id
+		LEFT JOIN sys_role t4
+		ON t2.role_id=t4.id
+		LEFT JOIN property_role_village t3
+		ON t2.role_id = t3.role_id
+		WHERE t3.village = #{village} AND (t4.description LIKE '%负责人%' OR (t4.description LIKE '%管理%' AND t1.username!='root'))
+
+	</select>
+
+	<select id="getDescriptionByNickname" resultType="java.lang.String">
+		SELECT t.description FROM sys_user_role t1
+		JOIN  sys_role t ON t.id=t1.role_id
+		JOIN sys_user t2 ON t1.user_id = t2.id
+		WHERE t2.nickname=#{nickname}
+	</select>
+</mapper>

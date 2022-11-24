@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ChargeMapper">
+
+    <select id="queryBuildingByVillage" resultType="java.lang.String">
+        SELECT DISTINCT building FROM `property_house_info` where village=#{village} order by building asc
+    </select>
+
+    <select id="queryLocationByVillageBuilding" resultType="java.lang.String">
+        SELECT DISTINCT location FROM `property_house_info` where village=#{village} and building=#{building} order by location asc
+    </select>
+
+    <select id="queryHouse" resultType="java.lang.String">
+         SELECT DISTINCT room FROM `property_house_info` where village=#{village} and building=#{building} and location = #{location} order by room asc
+    </select>
+
+    <select id="queryHouseInfo" resultType="com.zyd.shiro.business.entity.HouseInfo">
+        SELECT
+        house_id as houseId,
+        village,
+        building,
+        location,
+        room,
+        room_area as roomArea,
+        owner_name as ownerName,
+        owner_phone as ownerPhone,
+        id_card_no as idCardNo,
+        reserve_phone as reservePhone,
+        update_time as updateTime,
+        check_in_time as checkInTime
+        FROM `property_house_info`
+        where village=#{village} and building=#{building} and location=#{location} and room=#{room}
+    </select>
+
+    <select id="queryBind" resultType="com.zyd.shiro.business.entity.HouseInfo">
+        SELECT
+        t1.house_id as houseId,
+        t1.village,
+        t1.building,
+        t1.location,
+        t1.room,
+        t1.room_area as roomArea,
+        t1.owner_name as ownerName,
+        t1.owner_phone as ownerPhone,
+        t1.id_card_no as idCardNo,
+        t1.reserve_phone as reservePhone,
+        t1.update_time as updateTime,
+        t1.check_in_time as checkInTime
+        FROM `property_bind` t
+        inner join `property_house_info` t1 on t1.house_id = t.house_id
+        where t.phone = #{phone}
+    </select>
+
+    <insert id="addBind">
+        INSERT INTO `property_bind`
+        (phone,house_id)
+        values
+        (#{phone},#{houseId})
+    </insert>
+
+    <delete id="deleteBind">
+        delete from `property_bind`
+        where house_id = #{houseId} and phone= #{phone}
+    </delete>
+
+
+    <resultMap id="map1" type="com.zyd.shiro.business.entity.Charge">
+        <result column="cost_id" property="costId"/>
+        <result column="cost_name" property="costName"/>
+        <result column="cost_type" property="costType"/>
+        <result column="cost_type_class" property="costTypeClass"/>
+        <result column="cost_type_section" property="costTypeSection"/>
+        <result column="unit" property="unit"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <association property="carNo" column="car_id" select="queryCarNo" javaType="java.lang.String"/>
+        <association property="licensePlateNo" column="car_id" select="queryLicensePlateNo" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="queryCharge" resultMap="map1">
+        SELECT * FROM `property_cost_effective` t
+        INNER JOIN property_cost_config s on t.cost_id=s.cost_id
+        where t.house_id=#{houseId} and s.del_flag=1 and t.pay_flag = 0
+        order by s.cost_type
+    </select>
+
+    <select id="queryCarNo" resultType="java.lang.String">
+        SELECT car_no FROM `property_house_car` where car_id=#{carId}
+    </select>
+
+    <select id="queryLicensePlateNo" resultType="java.lang.String">
+        SELECT license_plate_no FROM `property_house_car` where car_id=#{carId}
+    </select>
+
+    <select id="queryCarId" resultType="java.lang.String">
+        SELECT car_id FROM `property_house_car` where car_no=#{carNo} and house_id=#{houseId} and cost_id=#{costId}
+    </select>
+
+
+    <insert id="insertBillInfo" parameterType="com.zyd.shiro.business.entity.BillInfo">
+        INSERT INTO `property_bill_info`
+        (order_id,house_id,pay_sum,pay_time,check_flag,check_time,pay_type,bill_type,status,receive_name,remark,is_exchange)
+        values
+        (#{orderId},#{houseId},#{paySum},#{payTime},#{checkFlag},#{checkTime},#{payType},#{billType},#{status},#{receiveName},#{remark},0)
+    </insert>
+
+    <update id="updateBillInfo">
+        update property_bill_info set status = #{status},out_trade_id=#{outTradeId} where order_id = #{orderId}
+    </update>
+    <select id="getOutTradeId" resultType="java.lang.String">
+        SELECT out_trade_id FROM property_bill_info where order_id = #{orderId}
+    </select>
+
+    <update id="updateBillRefund">
+        update property_bill_info set refund_flag = #{refundFlag} where order_id = #{orderId}
+    </update>
+
+    <update id="updateConfig">
+        update `property_cost_effective` set begin_time= #{day},update_time=#{updateTime},pay_flag =0
+        where house_id = #{houseId} and cost_id= #{costId}
+        <if test="carId != null and carId !=''">
+            and car_id = #{carId}
+        </if>
+    </update>
+
+    <delete id="deleteConfig">
+        update `property_cost_effective` set pay_flag = 1
+        where house_id = #{houseId} and cost_id= #{costId}
+        <if test="carId != null and carId !=''">
+            and car_id = #{carId}
+        </if>
+    </delete>
+
+    <delete id="deleteBillRefund">
+        delete from property_bill_info where order_id=#{orderId}
+    </delete>
+
+    <insert id="insertConfig">
+        insert into `property_cost_effective` (house_id,car_id,cost_id,begin_time,end_time,update_time) values
+        (#{houseId},#{carId},#{costId},#{beginDate},#{endDate},#{updateTime})
+    </insert>
+
+    <insert id="insertBillItem" parameterType="com.zyd.shiro.business.entity.BillItem">
+         INSERT INTO  `property_bill_item`
+         (order_id,
+         cost_name,
+         cost_type,
+         begin_time,
+         end_time,
+         unit,
+         discount,
+         pay,
+         area,
+         car_no,
+         cost_id,
+         discount_rate,
+         cost_type_class,
+         cost_type_section,
+         license_plate_no)
+         values
+         (#{orderId},
+         #{costName},
+         #{costType},
+         #{beginTime},
+         #{endTime},
+         #{unit},
+         #{discount},
+         #{pay},
+         #{area},
+         #{carId},
+         #{costId},
+         #{discountRate},
+         #{costTypeClass},
+         #{costTypeSection},
+         #{licensePlateNo})
+    </insert>
+
+    <resultMap id="map2" type="com.zyd.shiro.business.entity.BillInfo">
+        <result column="order_id" property="orderId"/>
+        <result column="house_id" property="houseId"/>
+        <result column="pay_sum" property="paySum"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="pay_type" property="payType"/>
+        <result column="bill_type" property="billType"/>
+        <result column="remark" property="remark"/>
+        <result column="refund_flag" property="refundFlag"/>
+        <collection property="billItemList" column="order_id" select="queryItemById" ofType="com.zyd.shiro.business.entity.BillItem"/>
+    </resultMap>
+    <select id="queryBill" resultMap="map2">
+        SELECT * FROM `property_bill_info` t inner join property_house_info s on t.house_id=s.house_id
+        where s.village=#{village} and s.building=#{building} and s.location=#{location} and s.room=#{room} and status = 0 order by t.pay_time desc
+    </select>
+
+    <select id="queryItemById" resultType="com.zyd.shiro.business.entity.BillItem">
+        SELECT
+        cost_id as costId,
+        order_id as orderId,
+        cost_name as costName,
+        cost_type as costType,
+		cost_type_class as costTypeClass,
+		cost_type_section as costTypeSection,
+        begin_time as beginTime,
+        end_time as endTime,
+        unit as unit,
+        discount as discount,
+		discount_rate as discountRate,
+        area as area,
+        car_no as carId,
+        license_plate_no as licensePlateNo,
+        pay as pay
+        FROM `property_bill_item`
+        where order_id=#{orderId}
+    </select>
+
+    <select id="queryBillInfoById" resultType="com.zyd.shiro.business.entity.BillInfo">
+        SELECT
+        house_id as houseId
+        FROM `property_bill_info`
+        where order_id=#{orderId}
+    </select>
+
+    <select id="queryEffectiveTime" resultType="com.zyd.shiro.business.entity.Charge">
+        SELECT
+        s.cost_name as costName,
+        t.begin_time as beginTime,
+        t.end_time as endTime
+        FROM `property_cost_effective` t INNER JOIN property_cost_config s on t.cost_id=s.cost_id
+        <where>
+            <if test="houseId != null and houseId !=''">
+                t.house_id = #{houseId}
+            </if>
+            <if test="carId != null and carId !=''">
+                and t.car_id = #{carId}
+            </if>
+            <if test="costId != null and costId !=''">
+                and t.cost_id = #{costId}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryNameById" resultType="java.lang.String">
+        SELECT nickname FROM `sys_user` where id=#{userId}
+    </select>
+
+    <select id="existBill" resultType="java.lang.Integer">
+        select count(*) from property_bill_info t1
+        inner join property_bill_item t on t.order_id = t1.order_id
+        where t.cost_id = #{bill.costId}
+        and t1.order_id = #{orderId}
+        <if test="bill.carId != null and bill.carId !=''">
+            and t.car_no = #{bill.carId}
+        </if>
+        and t1.house_id = #{houseId}
+        and t1.refund_flag = 1
+    </select>
+
+    <select id="queryDeposit" parameterType="com.zyd.shiro.business.entity.Deposit" resultType="com.zyd.shiro.business.entity.Deposit">
+        select
+        t.order_id as orderId,
+        t.bill_type as billType,
+        t.pay_time as payTime,
+        t.pay_type as payType,
+        t1.cost_id as costId,
+        t1.cost_name as costName,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.unit as unit,
+        t1.discount as discount,
+        t1.discount_rate as discountRate,
+        t1.area as area,
+        t1.car_no as carId,
+        t1.license_plate_no as licensePlateNo,
+        t1.pay as pay,
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone
+        from property_bill_info t
+        left join property_bill_item t1 on t.order_id = t1.order_id
+        left join property_house_info t2 on t.house_id = t2.house_id
+        where t1.cost_type = '押金类' and t.status = 0
+        <if test="costName != null and costName !=''">
+            and t1.cost_name = #{costName}
+        </if>
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="ownerName != null and ownerName !=''">
+            and t2.owner_name = #{ownerName}
+        </if>
+        <if test="ownerPhone != null and ownerPhone !=''">
+            and t2.owner_phone = #{ownerPhone}
+        </if>
+        <if test="billType != null">
+            and t.bill_type = #{billType}
+        </if>
+        <if test="orderId != null and orderId !=''">
+            and t.order_id = #{orderId}
+        </if>
+        order by t.pay_time desc
+    </select>
+
+    <select id="queryRefundList" parameterType="com.zyd.shiro.business.entity.Deposit" resultType="com.zyd.shiro.business.entity.Deposit">
+        select
+        t.order_id as orderId,
+        t.bill_type as billType,
+        t.pay_time as payTime,
+        t.pay_type as payType,
+        t1.cost_id as costId,
+        t1.cost_name as costName,
+        t1.cost_type as costType,
+        t1.cost_type_class as costTypeClass,
+        t1.cost_type_section as costTypeSection,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime,
+        t1.unit as unit,
+        t1.discount as discount,
+        t1.discount_rate as discountRate,
+        t1.area as area,
+        t1.car_no as carId,
+        t1.license_plate_no as licensePlateNo,
+        t1.pay as pay,
+        t2.house_id as houseId,
+        t2.village,
+        t2.building,
+        t2.location,
+        t2.room,
+        t2.room_area as roomArea,
+        t2.owner_name as ownerName,
+        t2.owner_phone as ownerPhone,
+        t2.id_card_no as idCardNo,
+        t2.reserve_phone as reservePhone,
+        (CASE WHEN t3.refund_type = '0' THEN '原路退回' WHEN t3.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+        ifNull(t3.status,9) as status
+        from property_bill_info t
+        left join property_bill_item t1 on t.order_id = t1.order_id
+        left join property_house_info t2 on t.house_id = t2.house_id
+        left join property_approval t3 on t1.order_id = t3.order_id and t1.cost_id = t3.cost_id
+        where t1.cost_type = '押金类' and t.status = 0 and t.pay_type = 0
+        <if test="villageList != null and villageList.size>0">
+            and t2.village in
+            <foreach collection="villageList" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+        <if test="costName != null and costName !=''">
+            and t1.cost_name = #{costName}
+        </if>
+        <if test="village != null and village !=''">
+            and t2.village = #{village}
+        </if>
+        <if test="building != null">
+            and t2.building = #{building}
+        </if>
+        <if test="location != null">
+            and t2.location = #{location}
+        </if>
+        <if test="room != null and room !=''">
+            and t2.room = #{room}
+        </if>
+        <if test="ownerName != null and ownerName !=''">
+            and t2.owner_name = #{ownerName}
+        </if>
+        <if test="ownerPhone != null and ownerPhone !=''">
+            and t2.owner_phone = #{ownerPhone}
+        </if>
+        <if test="billType != 9">
+            and t.bill_type = #{billType}
+        </if>
+        <if test="orderId != null and orderId !=''">
+            and t.order_id = #{orderId}
+        </if>
+        order by t.pay_time desc
+    </select>
+
+    <select id="getVillage" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT t.village FROM property_role_village t
+        LEFT JOIN sys_user_role t1 ON t.role_id = t1.role_id
+        LEFT JOIN sys_user t2 ON t1.user_id = t2.id
+        WHERE t2.username = #{username}
+    </select>
+
+    <select id="queryPhone" resultType="java.lang.String">
+		SELECT phone FROM property_wx_auth where open_id = #{openid}
+	</select>
+
+    <insert id="saveAuth">
+		insert into property_wx_auth (phone,open_id) values (#{phone},#{openId})
+	</insert>
+
+    <resultMap id="vm" type="com.zyd.shiro.persistence.beans.SysVillage">
+        <result property="id" jdbcType="BIGINT" column="id"/>
+        <result property="villageName" jdbcType="VARCHAR" column="village_name"/>
+        <result property="shopCode" jdbcType="VARCHAR" column="shop_code"/>
+        <result property="createTime" jdbcType="DATE" column="create_time"/>
+        <result property="updateTime" jdbcType="DATE" column="update_time"/>
+        <result property="mark" jdbcType="VARCHAR" column="mark"/>
+        <result property="staffCode" jdbcType="VARCHAR" column="staff_code"/>
+    </resultMap>
+    <select id="queryShopIdByHouseId" resultMap="vm">
+        SELECT a.* FROM sys_village a
+        JOIN
+        (SELECT * FROM property_house_info WHERE house_id=#{houseId}) b
+        ON
+        b.village=a.village_name
+    </select>
+</mapper>

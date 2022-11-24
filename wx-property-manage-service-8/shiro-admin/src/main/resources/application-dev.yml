@@ -1,0 +1,50 @@
+# Server settings
+server:
+    port: 9000
+
+api:
+    version: release
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: 'info,health'
+    security:
+        enabled: false                
+
+swagger:
+    flag: true
+
+spring:
+    datasource:
+        url: jdbc:oracle:thin://@18.35.145.221:1521/orcl
+        username: wxgalaxy
+        password: wxgalaxy
+        driver-class-name:
+            oracle:
+                jdbc:
+                    driver: OracleDriver
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
+            enabled: true
+            charset: UTF-8
+            file-size-threshold: 2KB
+            location: /home/file/upload
+# MyBatis
+mybatis-plus:
+    type-aliases-package: com.component.nbcb.**.domain.**,com.nbcb.wuxfh.attract.domain.entity.**
+    mapper-locations: classpath*:mapper/*.xml
+    configuratuion:
+        jdbc-type-for-null: null
+
+session:
+    timeOut: 1800000
+
+file:
+    temp-output-path: /home/file/temp
+    enable-degist: true
+
+

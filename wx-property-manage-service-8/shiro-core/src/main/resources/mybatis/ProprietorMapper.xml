@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zyd.shiro.persistence.mapper.ProprietorMapper">
+
+
+    <select id="queryHouse" resultType="com.zyd.shiro.business.entity.HouseInfo">
+        select
+        house_id as houseId,
+        village,
+        building,
+        location,
+        room,
+        room_area as roomArea,
+        owner_name as ownerName,
+        owner_phone as ownerPhone,
+        id_card_no as idCardNo,
+        reserve_phone as reservePhone,
+        update_time as updateTime,
+        check_in_time as checkInTime
+        from property_house_info
+        where 1=1
+        <if test="houseInfo.village != null and houseInfo.village != ''">
+            and village = #{houseInfo.village}
+        </if>
+        <if test="houseInfo.building != null">
+            and building = #{houseInfo.building}
+        </if>
+        <if test="houseInfo.location != null">
+            and location = #{houseInfo.location}
+        </if>
+        <if test="houseInfo.room != null and houseInfo.room != ''">
+            and room = #{houseInfo.room}
+        </if>
+        <if test="houseInfo.ownerName != null and houseInfo.ownerName != ''">
+            and owner_name = #{houseInfo.ownerName}
+        </if>
+        <if test="houseInfo.ownerPhone != null and houseInfo.ownerPhone != ''">
+            and owner_phone = #{houseInfo.ownerPhone}
+        </if>
+        <if test="villages != null and villages.size>0">
+            and village in
+            <foreach collection="villages" item="v" separator="," open="(" close=")">
+                #{v}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryDetail" parameterType="java.lang.String" resultType="com.zyd.shiro.business.entity.ProprietorDetail">
+        select
+        t4.car_id as carId,
+        t4.car_no as carNo,
+        t4.license_plate_no as licensePlateNo,
+        t3.house_id as houseId,
+        t3.village,
+        t3.building,
+        t3.location,
+        t3.room,
+        t3.room_area as roomArea,
+        t3.owner_name as ownerName,
+        t3.owner_phone as ownerPhone,
+        t3.id_card_no as idCardNo,
+        t3.reserve_phone as reservePhone,
+        t3.check_in_time as checkInTime,
+        t2.cost_id as costId,
+        t2.cost_name as costName,
+        t2.cost_type as costType,
+        t2.cost_type_class as costTypeClass,
+        t2.cost_type_section as costTypeSection,
+        t2.unit,
+        t1.begin_time as beginTime,
+        t1.end_time as endTime
+        from property_cost_effective t1
+        left join property_cost_config t2 on t1.cost_id = t2.cost_id
+        left join property_house_info t3 on t1.house_id = t3.house_id
+        left join property_house_car t4 on t1.car_id = t4.car_id and t1.house_id = t4.house_id
+        where t1.house_id = #{houseId}
+    </select>
+
+    <select id="existDetail" parameterType="com.zyd.shiro.business.entity.ExistHouse" resultType="java.lang.Integer">
+        select count(*) from property_cost_effective
+        where house_id = #{houseId} and car_id = #{carId} and cost_id = #{costId}
+    </select>
+
+    <select id="existCar" parameterType="com.zyd.shiro.business.entity.ExistHouse" resultType="java.lang.Integer">
+        select count(*) from property_house_car
+        where cost_id = #{costId} and car_no = #{carNo}
+    </select>
+
+    <select id="existRent" parameterType="com.zyd.shiro.business.entity.ExistHouse" resultType="java.lang.String">
+        select t1.car_id as carId from property_cost_effective t
+        inner join property_house_car t1 on t.car_id = t1.car_id
+        where t.cost_id = #{costId} and t1.car_no = #{carNo}
+        and
+        (
+            (STR_TO_DATE(t.begin_time,'%Y-%m-%d')
+            between STR_TO_DATE(#{beginTime},'%Y-%m-%d')
+            and STR_TO_DATE(#{endTime},'%Y-%m-%d')-1
+            )
+            OR
+            (STR_TO_DATE(t.end_time,'%Y-%m-%d')
+            between STR_TO_DATE(#{beginTime},'%Y-%m-%d')+1
+            and STR_TO_DATE(#{endTime},'%Y-%m-%d')
+            )
+        );
+    </select>
+
+    <delete id="deleteEffective" parameterType="java.util.List">
+        delete from property_cost_effective
+        where house_id in
+        <foreach collection="list" item="houseId" index="index" separator="," open="(" close=")">
+            #{houseId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteHouse" parameterType="java.util.List">
+        delete from property_house_info
+        where house_id in
+        <foreach collection="list" item="houseId" index="index" separator="," open="(" close=")">
+            #{houseId}
+        </foreach>
+    </delete>
+
+    <insert id="addEffective">
+        insert into property_cost_effective
+        (
+        house_id,
+        car_id,
+        cost_id,
+        begin_time,
+        end_time,
+        update_time,
+        pay_flag
+        )
+        values
+        (
+        #{houseId},
+        #{carId},
+        #{costId},
+        #{beginTime},
+        #{endTime},
+        #{updateTime},
+        #{payFlag}
+        )
+    </insert>
+
+    <insert id="addCar">
+        insert into property_house_car
+        (
+        house_id,
+        car_id,
+        car_no,
+        <if test="licensePlateNo != null and licensePlateNo != ''">
+            license_plate_no,
+        </if>
+        cost_id,
+        update_time
+        )
+        values
+        (
+        #{houseId},
+        #{carId},
+        #{carNo},
+        <if test="licensePlateNo != null and licensePlateNo != ''">
+            #{licensePlateNo},
+        </if>
+        #{costId},
+        #{updateTime}
+        )
+    </insert>
+
+    <delete id="deleteDetail" parameterType="java.util.List">
+        delete from property_cost_effective
+        where (house_id,car_id,cost_id) in
+        <foreach collection="list" item="p" index="index" separator="," open="(" close=")">
+            (
+            #{p.houseId},
+            #{p.carId},
+            #{p.costId}
+            )
+        </foreach>
+    </delete>
+
+    <delete id="deleteCar" parameterType="java.util.List">
+        delete from property_house_car
+        where car_id in
+        <foreach collection="list" item="carId" index="index" separator="," open="(" close=")">
+            #{carId}
+        </foreach>
+    </delete>
+</mapper>
