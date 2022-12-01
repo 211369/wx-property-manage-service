@@ -25,6 +25,8 @@ public interface ChargeMapper {
 
     void insertBillInfo(BillInfo billInfo);
 
+    void insertRefundBillInfo(BillInfo billInfo);
+
     void updateConfig(@Param("houseId") String houseId, @Param("costId") String costId, @Param("carId") String carId, @Param("day") String day, @Param("updateTime") String updateTime);
 
     void deleteConfig(@Param("houseId") String houseId, @Param("costId") String costId, @Param("carId") String carId);

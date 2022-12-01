@@ -104,6 +104,13 @@
         (#{orderId},#{houseId},#{paySum},#{payTime},#{checkFlag},#{checkTime},#{payType},#{billType},#{status},#{receiveName},#{remark},0)
     </insert>
 
+    <insert id="insertRefundBillInfo" parameterType="com.zyd.shiro.business.entity.BillInfo">
+        INSERT INTO `property_bill_info`
+        (order_id,house_id,pay_sum,pay_time,check_flag,check_time,pay_type,bill_type,status,receive_name,remark,is_exchange,refund_flag)
+        values
+        (#{orderId},#{houseId},#{paySum},#{payTime},#{checkFlag},#{checkTime},#{payType},#{billType},#{status},#{receiveName},#{remark},0,1)
+    </insert>
+
     <update id="updateBillInfo">
         update property_bill_info set status = #{status},out_trade_id=#{outTradeId} where order_id = #{orderId}
     </update>
@@ -258,6 +265,7 @@
         select
         t.order_id as orderId,
         t.bill_type as billType,
+        t.refund_flag as refundFlag,
         t.pay_time as payTime,
         t.pay_type as payType,
         t1.cost_id as costId,
@@ -309,8 +317,8 @@
         <if test="ownerPhone != null and ownerPhone !=''">
             and t2.owner_phone = #{ownerPhone}
         </if>
-        <if test="billType != null">
-            and t.bill_type = #{billType}
+        <if test="refundFlag != null">
+            and t.refund_flag = #{refundFlag}
         </if>
         <if test="orderId != null and orderId !=''">
             and t.order_id = #{orderId}
@@ -322,6 +330,7 @@
         select
         t.order_id as orderId,
         t.bill_type as billType,
+        t.refund_flag as refundFlag,
         t.pay_time as payTime,
         t.pay_type as payType,
         t1.cost_id as costId,
@@ -348,12 +357,12 @@
         t2.owner_phone as ownerPhone,
         t2.id_card_no as idCardNo,
         t2.reserve_phone as reservePhone,
-        (CASE WHEN t3.refund_type = '0' THEN '原路退回' WHEN t3.refund_type = '1' THEN '指定收款账户退款' ELSE '现金退款' END) AS refundType,
+        (CASE WHEN t3.refund_type = '0' THEN '原路退回' WHEN t3.refund_type = '1' THEN '指定收款账户退款' WHEN t3.refund_type = '2' THEN '现金退款' ELSE '' END) AS refundType,
         ifNull(t3.status,9) as status
         from property_bill_info t
         left join property_bill_item t1 on t.order_id = t1.order_id
         left join property_house_info t2 on t.house_id = t2.house_id
-        left join property_approval t3 on t1.order_id = t3.order_id and t1.cost_id = t3.cost_id
+        left join (SELECT * FROM(SELECT * FROM property_approval ORDER BY insert_time DESC) a GROUP BY a.order_id ,a.cost_id) t3 on substring(t1.order_id,1,17) = t3.order_id and t1.cost_id = t3.cost_id
         where t1.cost_type = '押金类' and t.status = 0 and t.pay_type = 0
         <if test="villageList != null and villageList.size>0">
             and t2.village in
@@ -382,8 +391,11 @@
         <if test="ownerPhone != null and ownerPhone !=''">
             and t2.owner_phone = #{ownerPhone}
         </if>
-        <if test="billType != 9">
-            and t.bill_type = #{billType}
+        <if test="refundFlag == 1">
+            and t.refund_flag = #{refundFlag}
+        </if>
+        <if test="refundFlag == 0">
+            and (t.refund_flag IS NULL OR t.refund_flag = 0)
         </if>
         <if test="orderId != null and orderId !=''">
             and t.order_id = #{orderId}

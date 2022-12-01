@@ -36,9 +36,9 @@
                 </div>
             </div>
             <div class="item form-group col-md-2 _item">
-                <label class="col-md-4 col-sm-4 control-label" for="billType">退款状态:</label>
+                <label class="col-md-4 col-sm-4 control-label" for="refundFlag">退款状态:</label>
                 <div class="col-md-8 col-sm-8 col-xs-12 items">
-                    <select id="billType" name="billType" class="form-control">
+                    <select id="refundFlag" name="refundFlag" class="form-control">
                         <option value='null'>请选择</option>
                         <option value="0">未退款</option>
                         <option value="1">已退款</option>
@@ -143,6 +143,7 @@
                             <select id="refundType" name="refundType" class="form-control">
                                 <option>请选择</option>
                                 <option value="0">原路退回</option>
+
                             </select>
                         </div>
                     </div>
@@ -210,22 +211,20 @@
                     field: 'payType',
                     title: '支付方式',
                 },{
-                    field: 'billType',
+                    field: 'refundFlag',
                     title: '退款状态',
                     formatter: function(code, row, index) {
-                        if(code==0) return "未退款";
+                        if(code==0 | code==null) return "未退款";
                         else if(code==1) return "已退款";
-                        else if(code==2) return "审批中" ;
-                        else if(code==3) return "已审批";
                         else return "";
                     }
                 },{
                     field: 'payTime',
-                    title: $("#billType").val()==1?"退款时间":"缴费时间",
+                    title: $("#refundFlag").val()==1?"退款时间":"缴费时间",
                 },{
                     field: 'refundType',
                     title: '退款方式',
-                    visible: $("#billType").val()==3?true:false,
+                    visible: $("#refundType").val()==1?true:false,
                 },{
                     field: 'operate',
                     title: '操作',

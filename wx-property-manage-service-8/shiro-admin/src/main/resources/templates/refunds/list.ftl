@@ -36,9 +36,9 @@
                 </div>
             </div>
             <div class="item form-group col-md-2 _item">
-                <label class="col-md-4 col-sm-4 control-label" for="billType">退款状态:</label>
+                <label class="col-md-4 col-sm-4 control-label" for="refundFlag">退款状态:</label>
                 <div class="col-md-8 col-sm-8 col-xs-12 items">
-                    <select id="billType" name="billType" class="form-control">
+                    <select id="refundFlag" name="refundFlag" class="form-control">
                         <option value="9">请选择</option>
                         <option value="0">未退款</option>
                         <option value="1">已退款</option>
@@ -140,10 +140,29 @@
                     <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="refundType">退款方式: <span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                            <select id="refundType" name="refundType" class="form-control">
+                            <select id="refundType" name="refundType" class="form-control" onchange="charge()">
                                 <option>请选择</option>
                                 <option value="0">原路退回</option>
+
                             </select>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="refundAcctHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="refundAcct">退款到账账号: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="refundAcct" id="refundAcct" required="required" placeholder="请输入退款到账账号" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="acctNameHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="acctName">户名: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="acctName" id="acctName" required="required" placeholder="请输入申请人" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="bankHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bank">银行: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="bank" id="bank" required="required" placeholder="请输入银行" autocomplete="off"/>
                         </div>
                     </div>
                 </form>
@@ -205,25 +224,25 @@
                 },{
                     field: 'refundPay',
                     title: '退款金额(单位:元)',
-                    visible: $("#billType").val()==1?true:false,
+                    visible: $("#refundFlag").val()==1?true:false,
                 },{
                     field: 'payType',
                     title: '支付方式',
                 },{
-                    field: 'billType',
+                    field: 'refundFlag',
                     title: '退款状态',
                     formatter: function(code, row, index) {
-                        if(code==0) return "未退款";
+                        if(code==0 | code==null) return "未退款";
                         else if(code==1) return "已退款";
                         else return "";
                     }
                 },{
                     field: 'payTime',
-                    title: $("#billType").val()==1?"退款时间":"缴费时间",
+                    title: $("#refundFlag").val()==1?"退款时间":"缴费时间",
                 },{
                     field: 'refundType',
                     title: '退款方式',
-                    visible: $("#billType").val()==1?true:false,
+                    visible: $("#refundFlag").val()==1?true:false,
                 },{
                     field: 'status',
                     title: '审批状态',
@@ -246,7 +265,7 @@
                         //if(row.payType=="线上支付" && row.billType==0)return '<@shiro.hasPermission name="charge:refund"><button class="btn btn-xs btn-danger" onclick="depositRefundApply(' + JSON.stringify(row).replace(/"/g, '&quot;') + ')"><i class="fa fa-edit"></i>退款审批</button></@shiro.hasPermission>';
                         //else if(row.payType=="线上支付" && row.billType==3 && row.refundType=="原路退回")return '<@shiro.hasPermission name="charge:refund"><button class="btn btn-xs btn-danger" onclick="handleDepositRefund(' + JSON.stringify(row).replace(/"/g, '&quot;') + ')"><i class="fa fa-edit"></i>退款</button></@shiro.hasPermission>';
                         //else return '';
-                        if(row.payType=="线上支付" && row.billType==0 && row.status=='')return '<@shiro.hasPermission name="charge:refund"><button class="btn btn-xs btn-danger" onclick="depositRefundApply(' + JSON.stringify(row).replace(/"/g, '&quot;') + ')"><i class="fa fa-edit"></i>退款审批</button></@shiro.hasPermission>';
+                        if(row.payType=="线上支付" && row.billType==0 && (row.status=='' | row.status=='审批拒绝'))return '<@shiro.hasPermission name="charge:refund"><button class="btn btn-xs btn-danger" onclick="depositRefundApply(' + JSON.stringify(row).replace(/"/g, '&quot;') + ')"><i class="fa fa-edit"></i>退款审批</button></@shiro.hasPermission>';
                         else return '';                    }
                 }
             ],
@@ -371,8 +390,22 @@
         },function () {});
     }
 
+    function charge() {
+        var refund = $("#approvalModalForm #refundType").val();
+        if(refund!=="1"){
+            refundAcctHide.style.display='none';
+            acctNameHide.style.display='none';
+            bankHide.style.display='none';
+        }else{
+            refundAcctHide.style.display='block';
+            acctNameHide.style.display='block';
+            bankHide.style.display='block';
+        }
+    }
+
     //点击退款审批按钮，发起退款审批
     function depositRefundApply(data) {
+        console.log(12)
         approveUserList(data);
         $("#approvalModalForm #house").val(data.house);
         $("#approvalModalForm #ownerName").val(data.ownerName);
@@ -381,6 +414,9 @@
         $("#approvalModalForm #costType").val(data.costType);
         $("#approvalModalForm #pay").val(data.pay);
         $("#approvalModalForm #applyUser").val("${user.username}");
+        $("#approvalModalForm #refundAcct").val(data.refundAcct);
+        $("#approvalModalForm #acctName").val(data.acctName);
+        $("#approvalModalForm #bank").val(data.bank);
         $('#approvalModal').modal('show');
         $("#approvalModal .depositRefundApplySure").unbind("click").bind("click",function () {
             var params={
@@ -390,6 +426,9 @@
                 houseId:data.houseId,
                 applyUser:"${user.username}",
                 refundType:$("#approvalModalForm #refundType").val(),
+                refundAcct:$("#approvalModalForm #refundAcct").val(),
+                acctName:$("#approvalModalForm #acctName").val(),
+                bank:$("#approvalModalForm #bank").val(),
                 approveUser:$("#approvalModalForm #approveUser").val(),
                 costName:$("#approvalModalForm #costName").val(),
                 costType:$("#approvalModalForm #costType").val(),
@@ -458,6 +497,9 @@
         $("#approvalModalForm #refundType").val("请选择");
         $("#approvalModalForm #discount").val("");
         $("#approvalModalForm #discountRate").val("");
+        refundAcctHide.style.display='none';
+        acctNameHide.style.display='none';
+        bankHide.style.display='none';
     })
 
     //关闭退款页面

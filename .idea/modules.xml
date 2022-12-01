@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/wx-property-manage-service-8/shiro.iml" filepath="$PROJECT_DIR$/wx-property-manage-service-8/shiro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wx-property-manage-service-8/shiro-admin/shiro-admin.iml" filepath="$PROJECT_DIR$/wx-property-manage-service-8/shiro-admin/shiro-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wx-property-manage-service-8/shiro-core/shiro-core.iml" filepath="$PROJECT_DIR$/wx-property-manage-service-8/shiro-core/shiro-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/wx-property-manage-service-8.iml" filepath="$PROJECT_DIR$/.idea/wx-property-manage-service-8.iml" />
+    </modules>
+  </component>
+</project>

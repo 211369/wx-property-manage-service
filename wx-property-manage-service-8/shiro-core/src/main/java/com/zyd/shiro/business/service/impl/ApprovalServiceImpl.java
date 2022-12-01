@@ -87,35 +87,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 //            List<Map> approvers=listUsers(approval);
             String descrition=approvalMapper.getDescriptionByNickname(nickname);
             if (descrition.contains("负责人")||descrition.contains("管理")) {
-                //如果不是最后一级审批，更新审批人，进入下一级审批
-                List<String> nextApproveUserList = approvalMapper.getNextApproveUser();
-                approval.setNextApproveUserList(nextApproveUserList);
-                //List<String> nextApproveUserList = approvalMapper.getNextApproveUser();
-                String nextApproveUser = "";
-                for(String approveUser : nextApproveUserList){
-                    nextApproveUser += "," + approveUser;
-                }
-                nextApproveUser = nextApproveUser.substring(1);
-                approval.setNextApproveUser(nextApproveUser); //多个用户用逗号隔开
                 approval.setUpdateTime(new Date());
-                approvalMapper.updateStatus(approval);
-                approval.setRefundId(UUIDUtil.getUUID());
-                if(approval.getRefundType().equals("原路退回")){
-                    approval.setRefundType("0");
-                }else if(approval.getRefundType().equals("指定收款账户退款")) {
-                    approval.setRefundType("1");
-                }else {
-                    approval.setRefundType("2");
-                }
-                approval.setApprovalLevel(2);
-                approvalMapper.insertNewRefundApproval(approval);
-                map.put("code",200);
-                map.put("msg","退款审批通过，进行下一级审批");
-            } else if(descrition.contains("财务")){
-                //如果是最后一级财务审批，更新申请内容和审批状态
-                approval.setUpdateTime(new Date());
-                approval.setApprovalFlag("1");  //审批完成标记
-
                 if(approval.getRefundType().equals("原路退回")){
                     //调用退款接口
                     BillInfo billInfo = approvalMapper.getBillInfo(approval);
@@ -126,13 +98,43 @@ public class ApprovalServiceImpl implements ApprovalService {
                     if(!map.get("code").toString().equals("200")){
                         return map;
                     }else{
+                        approval.setApprovalFlag("1");  //审批完成标记
                         approvalMapper.updateApproval(approval);
                         approvalMapper.updateRefundApproval(approval);
                     }
                 }else{
+                    //如果不是原路退回不是最后一级审批，更新审批人，进入下一级审批
+                    List<String> nextApproveUserList = approvalMapper.getNextApproveUser();
+                    approval.setNextApproveUserList(nextApproveUserList);
+                    //List<String> nextApproveUserList = approvalMapper.getNextApproveUser();
+                    String nextApproveUser = "";
+                    for(String approveUser : nextApproveUserList){
+                        nextApproveUser += "," + approveUser;
+                    }
+                    nextApproveUser = nextApproveUser.substring(1);
+                    approval.setNextApproveUser(nextApproveUser); //多个用户用逗号隔开
+                    approvalMapper.updateStatus(approval);
+                    approval.setRefundId(UUIDUtil.getUUID());
+                    if(approval.getRefundType().equals("原路退回")){
+                        approval.setRefundType("0");
+                    }else if(approval.getRefundType().equals("指定收款账户退款")) {
+                        approval.setRefundType("1");
+                    }else {
+                        approval.setRefundType("2");
+                    }
+                    approval.setApprovalLevel(2);
+                    approvalMapper.insertNewRefundApproval(approval);
                     map.put("code",200);
-                    map.put("msg","审批完成，可进行退款");
+                    map.put("msg","退款审批通过，进行下一级审批");
                 }
+            } else if(descrition.contains("财务")){
+                //如果是最后一级财务审批，更新申请内容和审批状态
+                approval.setUpdateTime(new Date());
+                approval.setApprovalFlag("1");  //审批完成标记
+                approvalMapper.updateApproval(approval);
+                approvalMapper.updateRefundApproval(approval);
+                map.put("code",200);
+                map.put("msg","审批完成，可进行退款");
             }
         }else {
             //审批拒绝，更改状态
@@ -206,5 +208,6 @@ public class ApprovalServiceImpl implements ApprovalService {
 //        approvalMapper.deleteApproval(ids);
         approvalMapper.deleteDiscountApproval(ids);
         approvalMapper.deleteRefundApproval(ids);
+        approvalMapper.deleteApprovals(ids);
     }
 }

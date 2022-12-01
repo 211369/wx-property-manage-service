@@ -74,6 +74,8 @@ public class Deposit extends BaseConditionVO {
 
     private String refundType;
 
+    private int refundFlag;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

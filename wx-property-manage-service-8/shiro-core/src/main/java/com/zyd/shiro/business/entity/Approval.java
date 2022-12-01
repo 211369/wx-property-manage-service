@@ -72,4 +72,10 @@ public class Approval extends BaseConditionVO {
     private List<String> nextApproveUserList;
 
     private Integer approvalLevel;
+
+    private String refundAcct;
+
+    private String acctName;
+
+    private String bank;
 }

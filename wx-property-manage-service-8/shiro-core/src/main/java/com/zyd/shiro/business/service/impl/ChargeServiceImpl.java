@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.zyd.shiro.util.SecretUtil.decrypt2;
 
@@ -625,7 +626,8 @@ public class ChargeServiceImpl implements ChargeService {
         chargeMapper.updateBillRefund(billInfo.getOrderId(), 1);
         billInfo.setOrderId(traceNo);
         String houseId = billInfo.getHouseId();
-        chargeMapper.insertBillInfo(billInfo);
+        chargeMapper.insertRefundBillInfo(billInfo);
+
         List<BillItem> billItemList = billInfo.getBillItemList();
         for (BillItem billItem : billItemList) {
             billItem.setOrderId(traceNo);
@@ -708,7 +710,7 @@ public class ChargeServiceImpl implements ChargeService {
         //退款给原订单打标签
         chargeMapper.updateBillRefund(billInfo.getOrderId(), 1);
         billInfo.setOrderId(traceNo);
-        chargeMapper.insertBillInfo(billInfo);
+        chargeMapper.insertRefundBillInfo(billInfo);
 
         billItem.setOrderId(traceNo);
         Double pay = billItem.getPay();
@@ -790,18 +792,24 @@ public class ChargeServiceImpl implements ChargeService {
     public PageInfo<Deposit> queryDeposit(Deposit deposit) {
         List<Deposit> list = new ArrayList<>();
         PageInfo bean = new PageInfo(list);
-        if (1 == deposit.getBillType()) {
+        if (1 == deposit.getRefundFlag()) {
             PageHelper.startPage(deposit.getPageNumber(), deposit.getPageSize());
             list = chargeMapper.queryDeposit(deposit);
-            bean.setList(list);
-            bean = new PageInfo(list);
+            List<Deposit> returnRefund=list.stream().filter(d-> d.getBillType()==1).collect(Collectors.toList());
+            bean.setList(returnRefund);
+            bean = new PageInfo(returnRefund);
         } else {
             List<Deposit> refund = chargeMapper.queryDeposit(deposit);
-            deposit.setBillType(1);
+            deposit.setRefundFlag(1);
+            List<Deposit> returnRefund=refund.stream().filter(d-> d.getRefundFlag()!=1).collect(Collectors.toList());
             List<Deposit> refunded = chargeMapper.queryDeposit(deposit);
             refund.removeAll(refunded);
-            bean.setList(refund);
-            bean = new PageInfo(refund);
+            bean.setList(returnRefund);
+            bean = new PageInfo(returnRefund);
+//            List<Deposit> refunded = chargeMapper.queryDeposit(deposit);
+//            refund.removeAll(refunded);
+//            bean.setList(refund);
+//            bean = new PageInfo(refund);
         }
         return bean;
     }
@@ -812,18 +820,20 @@ public class ChargeServiceImpl implements ChargeService {
         deposit.setVillageList(villageList);
         List<Deposit> list = new ArrayList<>();
         PageInfo bean = new PageInfo(list);
-        if (1 == deposit.getBillType()) {
+        if (1 == deposit.getRefundFlag()) {
             PageHelper.startPage(deposit.getPageNumber(), deposit.getPageSize());
             list = chargeMapper.queryRefundList(deposit);
-            bean.setList(list);
-            bean = new PageInfo(list);
+            List<Deposit> returnRefund=list.stream().filter(d-> d.getBillType()==1).collect(Collectors.toList());
+            bean.setList(returnRefund);
+            bean = new PageInfo(returnRefund);
         } else {
             List<Deposit> refund = chargeMapper.queryRefundList(deposit);
-            deposit.setBillType(1);
+            deposit.setRefundFlag(1);
+            List<Deposit> returnRefund=refund.stream().filter(d-> d.getRefundFlag()!=1).collect(Collectors.toList());
             List<Deposit> refunded = chargeMapper.queryRefundList(deposit);
             refund.removeAll(refunded);
-            bean.setList(refund);
-            bean = new PageInfo(refund);
+            bean.setList(returnRefund);
+            bean = new PageInfo(returnRefund);
         }
         return bean;
     }

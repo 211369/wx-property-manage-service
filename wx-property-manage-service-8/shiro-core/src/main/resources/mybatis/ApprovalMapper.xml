@@ -14,6 +14,9 @@
 		t4.status,
 		t4.remark,
 		t4.refund_id AS refundId,
+		t4.refund_acct AS refundAcct,
+		t4.acct_name AS acctName,
+		t4.bank AS bank,
 		t.insert_time AS insertTime,
 		t.update_time AS updateTime,
 		t1.house_id AS houseId,
@@ -82,6 +85,9 @@
 		t4.status,
 		t4.remark,
 		t4.refund_id AS refundId,
+		t4.refund_acct AS refundAcct,
+		t4.acct_name AS acctName,
+		t4.bank AS bank,
 		t.insert_time AS insertTime,
 		t.update_time AS updateTime,
 		t1.house_id AS houseId,
@@ -150,6 +156,9 @@
 		t4.status,
 		t4.remark,
 		t4.refund_id AS refundId,
+		t4.refund_acct AS refundAcct,
+		t4.acct_name AS acctName,
+		t4.bank AS bank,
 		t.insert_time AS insertTime,
 		t.update_time AS updateTime,
 		t1.house_id AS houseId,
@@ -294,6 +303,9 @@
 		approval_flag,
 		cost_id,
 		approval_level,
+		refund_acct,
+		acct_name,
+		bank,
 		insert_time
 		)
 		values
@@ -309,6 +321,9 @@
 		#{approvalFlag},
 		#{costId},
 		#{approvalLevel},
+		#{refundAcct},
+		#{acctName},
+		#{bank},
 		#{insertTime}
 		)
 	</insert>
@@ -326,6 +341,9 @@
 		status,
 		cost_id,
 		approval_level,
+		refund_acct,
+		acct_name,
+		bank,
 		insert_time
 		)
 		values
@@ -340,6 +358,9 @@
 		'0',
 		#{costId},
 		#{approvalLevel},
+		#{refundAcct},
+		#{acctName},
+		#{bank},
 		#{updateTime}
 		)
 	</insert>
@@ -380,7 +401,7 @@
 	<select id="existApproval" resultType="java.lang.Integer">
 		select count(*) from property_approval t1
 		where t1.order_id = #{orderId}
-		and t1.cost_id = #{costId}
+		and t1.cost_id = #{costId} and t1.status != 2
 	</select>
 
 	<select id="getId" parameterType="com.zyd.shiro.business.entity.Approval" resultType="java.lang.String">
@@ -398,7 +419,7 @@
 	<select id="existRefundApproval" resultType="java.lang.Integer">
 		select count(*) from property_approval_refund t1
 		where t1.order_id = #{orderId}
-		and t1.cost_id = #{costId}
+		and t1.cost_id = #{costId} and t1.status != 2
 	</select>
 
 <!--	<select id="getNextUserName" parameterType="com.zyd.shiro.business.entity.Approval" resultType="java.lang.String">-->
@@ -452,7 +473,10 @@
 
 	<update id="updateRefundType" parameterType="com.zyd.shiro.business.entity.Approval">
 		update property_approval_refund
-		set refund_type = #{refundType}
+		set refund_type = #{refundType} ,
+		refund_acct = #{refundAcct} ,
+		acct_name = #{acctName} ,
+		bank = #{bank}
 		where refund_id = #{refundId}
 	</update>
 
@@ -474,6 +498,14 @@
         update_time = #{updateTime}
         where id = #{id}
     </update>
+
+	<delete id="deleteApprovals" parameterType="java.util.List">
+		delete from property_approval
+		where id in
+		<foreach collection="ids" item="id" index="index" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</delete>
 
 	<update id="updateRefundApproval" parameterType="com.zyd.shiro.business.entity.Approval">
 		update property_approval_refund

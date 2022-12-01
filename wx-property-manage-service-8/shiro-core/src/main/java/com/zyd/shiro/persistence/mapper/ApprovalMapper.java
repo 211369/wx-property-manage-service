@@ -67,6 +67,7 @@ public interface ApprovalMapper {
 
     void deleteRefundApproval(@Param("ids") List<String> ids);
 
+    void deleteApprovals(@Param("ids") List<String> ids);
 
     String getDescriptionByNickname(@Param("nickname") String nickname);
 }

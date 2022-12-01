@@ -198,6 +198,24 @@
                             <input type="text" class="form-control col-md-12 col-xs-12" name="refundType" id="refundType" readonly="readonly" required="required" placeholder="请选择退款方式" autocomplete="off"/>
                         </div>
                     </div>
+                    <div class="item form-group" id="refundAcctHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="refundAcct">退款到账账号: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="refundAcct" id="refundAcct" required="required" placeholder="请输入退款到账账号" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="acctNameHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="acctName">户名: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="acctName" id="acctName" required="required" placeholder="请输入户名" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="bankHide" style="display:none">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bank">银行: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="bank" id="bank" required="required" placeholder="请输入银行" autocomplete="off"/>
+                        </div>
+                    </div>
                     <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="remark">审批意见:</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
@@ -379,6 +397,15 @@
 
     //展示审批弹窗
     function showRefundApprovalWindow(data){
+        if(data.refundType!=="指定收款账户退款"){
+            refundAcctHide.style.display='none';
+            acctNameHide.style.display='none';
+            bankHide.style.display='none';
+        }else{
+            refundAcctHide.style.display='block';
+            acctNameHide.style.display='block';
+            bankHide.style.display='block';
+        }
         var formData=$("#refundApprovalModalForm").serializeObject();
         Object.keys(formData).forEach(function (item, index) {
             $("#refundApprovalModalForm #"+item).val(data[item]);
@@ -394,6 +421,9 @@
                 refundType:data.refundType,
                 approvalType:data.approvalType,
                 approveUser:data.approveUser,
+                refundAcct:data.refundAcct,
+                acctName:data.acctName,
+                bank:data.bank,
                 remark:$("#refundApprovalModalForm #remark").val(),
                 status:Number($(this).attr("data-type"))
             }

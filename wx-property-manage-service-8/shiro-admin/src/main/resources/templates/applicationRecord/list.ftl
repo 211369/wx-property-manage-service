@@ -194,10 +194,29 @@
                     <div class="item form-group">
                         <label class="control-label col-md-4 col-sm-4 col-xs-12" for="refundType">退款方式: <span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                            <select id="refundType" name="refundType" class="form-control">
+                            <select id="refundType" name="refundType" class="form-control" onchange="charge()">
                                 <option>请选择</option>
                                 <option value="原路退回">原路退回</option>
+
                              </select>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="refundAcctHide" style="display:none">
+                        <label class="control-label col-md-4 col-sm-4 col-xs-12" for="refundAcct">退款到账账号: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="refundAcct" id="refundAcct" required="required" placeholder="请输入退款到账账号" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="acctNameHide" style="display:none">
+                        <label class="control-label col-md-4 col-sm-4 col-xs-12" for="acctName">户名: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="acctName" id="acctName" required="required" placeholder="请输入户名" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item form-group" id="bankHide" style="display:none">
+                        <label class="control-label col-md-4 col-sm-4 col-xs-12" for="bank">银行: <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control col-md-12 col-xs-12" name="bank" id="bank" required="required" placeholder="请输入银行" autocomplete="off"/>
                         </div>
                     </div>
                 </form>
@@ -403,8 +422,31 @@
         })
         $("#applicationModal").modal("show");
     }
+
+    function charge() {
+        var refund = $("#refundApplicationModalForm #refundType").val();
+        if(refund!=="指定收款账户退款"){
+            refundAcctHide.style.display='none';
+            acctNameHide.style.display='none';
+            bankHide.style.display='none';
+        }else{
+            refundAcctHide.style.display='block';
+            acctNameHide.style.display='block';
+            bankHide.style.display='block';
+        }
+    }
+
     //展示退款审批编辑弹窗
     function showRefundApplicationWindow(data){
+        if(data.refundType!=="指定收款账户退款"){
+            refundAcctHide.style.display='none';
+            acctNameHide.style.display='none';
+            bankHide.style.display='none';
+        }else{
+            refundAcctHide.style.display='block';
+            acctNameHide.style.display='block';
+            bankHide.style.display='block';
+        }
         console.log(data,999)
         var formData=$("#refundApplicationModalForm").serializeObject();
         Object.keys(formData).forEach(function (item, index) {
@@ -417,6 +459,9 @@
                 houseId:data.houseId,
                 orderId:data.orderId,
                 refundType :$("#refundApplicationModalForm #refundType").val(),
+                refundAcct :$("#refundApplicationModalForm #refundAcct").val(),
+                acctName :$("#refundApplicationModalForm #acctName").val(),
+                bank :$("#refundApplicationModalForm #bank").val(),
             }
             $.ajax({
                 url: "/approval/updateRefundType",
